@@ -7,7 +7,7 @@
 <meta name="author" content="Jobit Joseph">
 <!-- Lottie Forge © 2026 Jobit Joseph. All rights reserved. -->
 <style>
-/* Layout: workbench — numbered pipeline on the left (source → vectorise → motion → export), sticky preview stage on the right */
+/* Layout: one-screen workbench — top bar, tabbed controls on the left, preview stage on the right; fits 1280×720 and up without page scrolling */
 :root {
   --bg: #eef2f3; --panel: #ffffff; --sunk: #f5f8f9; --ink: #13212a; --muted: #586a75; --line: #d6dee2;
   --accent: #0a7570; --accent-ink: #ffffff; --accent-soft: #d9efed; --key: #b45309; --ok: #15803d; --err: #b42318;
@@ -33,352 +33,393 @@
 [hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
-  background: var(--bg); color: var(--ink); font: 14px/1.5 var(--font-body);
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 20px 40px;
+  background: var(--bg); color: var(--ink); font: 13px/1.45 var(--font-body);
+  padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
+  padding-block: 8px;
+  display: flex; flex-direction: column; gap: 8px; min-height: 100vh;
 }
-header.top { max-width: 1320px; margin: 0 auto 18px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
-header.top h1 { font: 700 28px/1.1 var(--font-display); margin: 0; letter-spacing: -0.01em; }
-header.top h1 span { color: var(--accent); }
-header.top p { margin: 0; color: var(--muted); max-width: 70ch; }
-.app { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 450px) minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 920px) { .app { grid-template-columns: minmax(0, 1fr); } .stage { position: static !important; order: -1; } .canvasbox { max-height: 46vh; } }
-.steps { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-section.step { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.step h2 { margin: 0; font: 600 16px/1.2 var(--font-display); display: flex; align-items: center; gap: 10px; }
-.step h2 .n { font: 500 12px/1 var(--font-mono); color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 3px 5px; }
-.step h2 .aside { margin-left: auto; font: 400 12px var(--font-body); color: var(--muted); }
-.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
-.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
-label.f { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+/* top bar */
+.topbar { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; max-width: 1920px; width: 100%; margin: 0 auto; }
+.topbar h1 { font: 700 20px/1 var(--font-display); margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
+.topbar h1 span { color: var(--accent); }
+.srcbar { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; padding: 4px 4px 4px 10px; border: 1.5px dashed var(--line); border-radius: var(--r); background: var(--panel); }
+.srcbar.over { border-color: var(--accent); background: var(--accent-soft); }
+.srcbar #srcName { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+.srcbar #srcName.has { color: var(--ink); }
+/* main grid */
+.app { flex: 1; min-height: 0; max-width: 1920px; width: 100%; margin: 0 auto; display: grid; grid-template-columns: minmax(330px, 380px) minmax(0, 1fr); gap: 10px; }
+@media (min-width: 1600px) { .app { grid-template-columns: 420px minmax(0, 1fr); } }
+.controls { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.steptabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+.steptabs button { border: 0; border-radius: 0; background: transparent; padding: 8px 4px 7px; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px; color: var(--muted); border-bottom: 2px solid transparent; }
+.steptabs button b { font: 500 10px var(--font-mono); color: var(--accent); }
+.steptabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); background: var(--sunk); }
+.steptabs button:hover { color: var(--ink); }
+.pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pane h2 { margin: 0; font: 600 14px/1.2 var(--font-display); display: flex; align-items: center; gap: 8px; }
+.pane h2 .aside { margin-left: auto; font: 400 11px var(--font-mono); color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; }
+.checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 10px; }
+label.f { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; color: var(--muted); min-width: 0; }
 label.f > span { display: flex; justify-content: space-between; gap: 6px; }
 label.f output { font-family: var(--font-mono); color: var(--ink); }
-label.chk { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+label.chk { display: flex; gap: 7px; align-items: center; font-size: 12.5px; min-width: 0; }
 input[type=text], input[type=number], select, textarea {
-  font: inherit; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0;
+  font: inherit; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; width: 100%; min-width: 0;
 }
-input[type=range] { width: 100%; accent-color: var(--accent); }
-input[type=checkbox] { accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+input[type=range] { width: 100%; accent-color: var(--accent); margin: 2px 0; }
+input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; flex: none; margin: 0; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-button { font: 500 13px var(--font-body); border-radius: 6px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+button { font: 500 12.5px var(--font-body); border-radius: 6px; padding: 6px 10px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); white-space: nowrap; }
 button:hover { border-color: var(--accent); }
 button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 button.primary:hover { filter: brightness(1.08); }
 button.ghost { background: transparent; border-color: transparent; color: var(--muted); padding-inline: 6px; }
 button.ghost:hover { color: var(--ink); }
+button.icon { width: 30px; height: 30px; padding: 0; display: inline-grid; place-items: center; }
+button.icon svg { width: 16px; height: 16px; }
 button:disabled { opacity: .5; cursor: default; }
-.drop { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 18px 14px; text-align: center; background: var(--sunk); cursor: pointer; display: flex; flex-direction: column; gap: 4px; align-items: center; }
-.drop.over { border-color: var(--accent); background: var(--accent-soft); }
-.drop strong { font-weight: 600; }
-.drop small { color: var(--muted); }
-.srcinfo { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; }
-.srcinfo #srcName { min-width: 0; overflow-wrap: anywhere; }
-.chip { font: 500 11px/1 var(--font-mono); padding: 4px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-.hint { font-size: 12px; color: var(--muted); margin: 0; }
-details { border-top: 1px solid var(--line); padding-top: 10px; }
-details > summary { cursor: pointer; font-size: 13px; font-weight: 500; list-style: none; display: flex; align-items: center; gap: 6px; }
-details > summary::-webkit-details-marker { display: none; }
-details > summary::before { content: "▸"; color: var(--muted); font-size: 11px; transition: transform .15s; }
-details[open] > summary::before { transform: rotate(90deg); }
-details > .inner { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; }
+/* hover tooltips */
+[data-tip] { position: relative; }
+[data-tip]:hover::after, [data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; z-index: 60; left: 50%; top: calc(100% + 6px); transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); font: 500 11.5px/1.35 var(--font-body); padding: 5px 8px; border-radius: 5px;
+  white-space: normal; width: max-content; max-width: 240px; text-align: left; pointer-events: none; box-shadow: 0 4px 14px rgb(0 0 0 / .18);
+}
+[data-tip].tip-up:hover::after, [data-tip].tip-up:focus-visible::after { top: auto; bottom: calc(100% + 6px); }
+[data-tip].tip-left:hover::after { left: auto; right: 0; transform: none; }
+[data-tip].tip-right:hover::after { left: 0; transform: none; }
+label.primary { display: inline-flex; align-items: center; font: 500 12.5px var(--font-body); border-radius: 6px; padding: 6px 12px; background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); white-space: nowrap; }
+label.primary:hover { filter: brightness(1.08); }
+.chip { font: 500 10.5px/1 var(--font-mono); padding: 4px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.hint { font-size: 11.5px; color: var(--muted); margin: 0; }
 .status { font-size: 12px; color: var(--muted); }
 .status:empty { display: none; }
 .status.err { color: var(--err); }
 .status.ok { color: var(--ok); }
-.swatches { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.swatch { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); padding: 0; position: relative; }
+.drop { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 12px; text-align: center; background: var(--sunk); cursor: pointer; display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.drop:hover { border-color: var(--accent); }
+.drop small { color: var(--muted); }
+details { border-top: 1px solid var(--line); padding-top: 8px; }
+details > summary { cursor: pointer; font-size: 12.5px; font-weight: 500; list-style: none; display: flex; align-items: center; gap: 6px; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; color: var(--muted); font-size: 10px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > .inner { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.swatch { width: 24px; height: 24px; border-radius: 5px; border: 1px solid var(--line); padding: 0; position: relative; }
 .swatch[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
-.swatch.bg::after { content: "bg"; position: absolute; inset: auto 0 -15px; font: 10px var(--font-mono); color: var(--muted); }
+.swatch.bg { box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--muted); }
 .swatch.del { opacity: .35; }
 .swatch.del::before { content: ""; position: absolute; left: 3px; right: 3px; top: 50%; border-top: 2px solid var(--err); transform: rotate(-35deg); }
-.swatchbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
-.panel { border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--sunk); }
-.panel h3 { margin: 0; font: 600 13px var(--font-body); display: flex; align-items: center; gap: 8px; }
-.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 12px; font-size: 12.5px; margin: 0; }
+.swatchbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); }
+.panel { border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: flex; flex-direction: column; gap: 8px; background: var(--sunk); }
+.panel h3 { margin: 0; font: 600 12.5px var(--font-body); display: flex; align-items: center; gap: 8px; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: 11.5px; margin: 0; }
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .good { color: var(--ok); } .warn { color: var(--key); } .bad { color: var(--err); }
-.warnlist { margin: 0; padding-left: 16px; font-size: 12px; color: var(--key); }
+.warnlist { margin: 0; padding-left: 16px; font-size: 11.5px; color: var(--key); }
+.warnlist:empty { display: none; }
+.progress { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; flex: none; }
+.progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+.partsel .tag { font: 500 12px var(--font-mono); color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); padding: 5px 9px; }
+.seg button:last-child { border-right: 0; }
 /* stage */
-.stage { position: sticky; top: max(12px, env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.tabs { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.tabs .sp { flex: 1; }
+.stage { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+.stagebar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.stagebar [role=tab][aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.stagebar .sp { flex: 1; }
 .bgsw { display: flex; gap: 4px; align-items: center; }
-.bgsw button { width: 24px; height: 24px; padding: 0; border-radius: 50%; }
+.bgsw button { width: 22px; height: 22px; padding: 0; border-radius: 50%; }
 .bgsw button[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
-.view { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; min-width: 0; }
-.canvasbox { position: relative; width: 100%; aspect-ratio: 1 / 1; max-height: 64vh; border-radius: 6px; overflow: hidden; display: grid; place-items: center; }
-.canvasbox.checker { background-color: var(--check-a); background-image: linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%), linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%); background-size: 20px 20px; background-position: 0 0, 10px 10px; }
+.view { flex: 1; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.scrollbox { flex: 1; min-height: 0; overflow: auto; display: flex; border-radius: 6px; min-width: 0; }
+.scrollbox > .canvasbox { margin: auto; flex: none; }
+.canvasbox { position: relative; border-radius: 4px; overflow: hidden; display: grid; place-items: center; }
+.canvasbox.checker { background-color: var(--check-a); background-image: linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%), linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%); background-size: 16px 16px; background-position: 0 0, 8px 8px; }
 .canvasbox.light { background: #ffffff; }
 .canvasbox.dark { background: #0b0f12; }
+.fitbox { flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; }
+.fitbox canvas { max-width: 100%; max-height: 100%; display: block; }
+#partsCanvas { cursor: crosshair; }
 #lottieBox > svg { max-width: 100%; max-height: 100%; }
-.scrollbox { overflow: auto; max-height: 70vh; display: flex; border-radius: 6px; min-width: 0; }
-.scrollbox > .canvasbox { margin: auto; flex: none; }
-#resLabel:empty { display: none; }
 .busy { position: absolute; inset: 0; display: grid; place-items: center; background: color-mix(in srgb, var(--panel) 70%, transparent); font-size: 13px; color: var(--ink); }
 .empty { color: var(--muted); text-align: center; padding: 20px; max-width: 38ch; }
-.empty strong { display: block; color: var(--ink); font: 600 16px var(--font-display); margin-bottom: 4px; }
-.transport { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+.empty strong { display: block; color: var(--ink); font: 600 15px var(--font-display); margin-bottom: 4px; }
+.transport { display: flex; gap: 8px; align-items: center; flex: none; }
 .transport input[type=range] { flex: 1; }
-.transport .tc { font: 12px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 9ch; text-align: right; }
-#partsCanvas, #srcCanvas { max-width: 100%; max-height: 100%; display: block; }
-#partsCanvas { cursor: crosshair; }
-.filmstrip { display: flex; gap: 6px; overflow-x: auto; padding-top: 10px; }
-.filmstrip canvas { height: 54px; border: 1px solid var(--line); border-radius: 4px; flex: none; background: var(--check-a); }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; margin: 0; }
-.stats div { background: var(--panel); padding: 9px 11px; min-width: 0; }
-.stats dt { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-.stats dd { margin: 0; font: 500 17px var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.stats dd small { font-size: 11px; margin-left: 4px; }
-@media (max-width: 520px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid2 { grid-template-columns: minmax(0,1fr); } }
-.features { font: 12px var(--font-mono); color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; }
-.features span { border: 1px solid var(--line); border-radius: 4px; padding: 2px 6px; color: var(--ink); }
+.transport .tc { font: 11.5px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 8ch; text-align: right; }
+.filmstrip { display: flex; gap: 5px; overflow-x: auto; flex: none; }
+.filmstrip canvas { height: 44px; border: 1px solid var(--line); border-radius: 4px; flex: none; background: var(--check-a); }
+.stats { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; margin: 0; flex: none; }
+.stats div { background: var(--panel); padding: 5px 9px; min-width: 0; }
+.stats dt { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+.stats dd { margin: 0; font: 500 14px var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stats dd small { font-size: 10px; margin-left: 3px; }
+.infoline { display: flex; gap: 6px; align-items: center; min-width: 0; flex: none; min-height: 22px; }
+.features { font: 11px var(--font-mono); color: var(--muted); display: flex; flex-wrap: nowrap; gap: 5px; overflow: hidden; min-width: 0; flex: 1; }
+.features span { border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; color: var(--ink); white-space: nowrap; }
 .features span b { color: var(--accent); font-weight: 500; }
-.notes { font-size: 12px; color: var(--key); margin: 0; padding-left: 16px; }
+.notes { font-size: 11.5px; color: var(--key); margin: 0; padding: 0; list-style: none; display: flex; gap: 10px; flex-wrap: wrap; flex: none; }
 .notes:empty { display: none; }
-.progress { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
-.progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .15s; }
-.partsel { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
-.partsel .tag { font: 500 13px var(--font-mono); color: var(--accent); }
-.foot { max-width: 1320px; margin: 28px auto 0; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; font-size: 12px; color: var(--muted); }
+.notes li::before { content: "• "; }
+.foot { max-width: 1920px; width: 100%; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px; font-size: 11px; color: var(--muted); }
+/* one-screen mode on desktop-sized windows; on small screens the page scrolls normally */
+@media (min-width: 900px) and (min-height: 560px) {
+  body { height: 100vh; overflow: hidden; }
+}
+@media (max-width: 899px), (max-height: 559px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .stage { order: -1; }
+  .view { min-height: 60vh; }
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .controls { overflow: visible; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<header class="top">
+<header class="topbar">
   <h1>Lottie <span>Forge</span></h1>
-  <p>Turn an image, GIF, video, SVG or existing Lottie into an optimised, fully vector Lottie, ready for the web or for LottieMCU.</p>
+  <div id="drop" data-tip="Drop a file anywhere on the page, or click Open. Images, GIF, video, SVG or Lottie (.json / .lottie). Several images become a frame sequence." class="srcbar tip-right">
+    <span class="chip" id="srcKind">empty</span>
+    <span id="srcName">Drop an image, GIF, video, SVG or Lottie file</span>
+    <button class="ghost" id="loadSample" type="button" data-tip="Load a small built-in drawing to try the tool">Sample</button>
+    <label class="primary" for="fileIn" style="cursor:pointer"><span class="btnlike">Open file</span></label>
+    <input id="fileIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden>
+  </div>
 </header>
 
 <main class="app">
-  <div class="steps">
+  <section class="controls" aria-label="Settings">
+    <div class="steptabs" role="tablist">
+      <button type="button" role="tab" aria-selected="true" data-step="s1" data-tip="Frame sampling and trimming for GIF, video and Lottie sources"><b>01</b>Source</button>
+      <button type="button" role="tab" aria-selected="false" data-step="s2" data-tip="How the picture is turned into vector shapes: size, colours, smoothness, strokes"><b>02</b>Vectorise</button>
+      <button type="button" role="tab" aria-selected="false" data-step="s3" data-tip="Add motion presets, or choose how frame sequences become animation"><b>03</b>Motion</button>
+      <button type="button" role="tab" aria-selected="false" data-step="s4" data-tip="Optimise and download .json, .lottie, or a LottieMCU header" class="tip-left"><b>04</b>Export</button>
+    </div>
+
     <!-- 1 SOURCE -->
-    <section class="step" aria-labelledby="h1s">
-      <h2 id="h1s"><span class="n">01</span>Source</h2>
-      <label class="drop" id="drop" for="fileIn">
-        <strong>Drop an image, GIF, video, SVG or Lottie</strong>
-        <small>PNG, JPG, WebP, GIF, MP4, WebM, SVG, Lottie .json or .lottie. Several images become a frame sequence.</small>
-        <input id="fileIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden>
-      </label>
-      <div class="srcinfo">
-        <span class="chip" id="srcKind">empty</span>
-        <span id="srcName">No source loaded</span>
-        <span style="flex:1"></span>
-        <button class="ghost" id="loadSample" type="button">Load sample</button>
-      </div>
+    <div class="pane" id="s1">
+      <h2>Source</h2>
+      <label class="drop" for="fileIn"><strong>Drop or choose a file</strong><small>PNG, JPG, WebP, GIF, MP4, WebM, SVG, Lottie .json or .lottie</small></label>
       <div class="status" id="srcStatus" role="status"></div>
-      <details id="frameOpts">
-        <summary>GIF, video and Lottie frame sampling</summary>
-        <div class="inner">
-          <div class="grid2">
-            <label class="f"><span>Sample rate <output id="sfpsO">10 fps</output></span><input id="sfps" type="range" min="2" max="30" value="10"></label>
-            <label class="f"><span>Max frames <output id="maxfO">24</output></span><input id="maxf" type="range" min="2" max="120" value="24"></label>
-            <label class="f"><span>Start (s)</span><input id="trimA" type="number" min="0" step="0.1" value="0"></label>
-            <label class="f"><span>End (s, 0 = to the end)</span><input id="trimB" type="number" min="0" step="0.1" value="0"></label>
-          </div>
-          <label class="chk"><input type="checkbox" id="dedupe" checked>Merge near-identical frames</label>
-        </div>
-      </details>
-    </section>
+      <h2 style="margin-top:4px">Frame sampling <span class="aside">GIF, video, Lottie rebuild</span></h2>
+      <div class="grid2">
+        <label class="f" data-tip="How many frames per second to take from a GIF or video. Fewer frames give smaller files."><span>Sample rate <output id="sfpsO">10 fps</output></span><input id="sfps" type="range" min="2" max="30" value="10"></label>
+        <label class="f" data-tip="Upper limit on the number of frames taken"><span>Max frames <output id="maxfO">24</output></span><input id="maxf" type="range" min="2" max="120" value="24"></label>
+        <label class="f" data-tip="Skip everything before this time"><span>Start (s)</span><input id="trimA" type="number" min="0" step="0.1" value="0"></label>
+        <label class="f" data-tip="Stop at this time. 0 means play to the end."><span>End (s, 0 = end)</span><input id="trimB" type="number" min="0" step="0.1" value="0"></label>
+      </div>
+      <div class="checks">
+        <label class="chk" data-tip="Frames that look the same as the one before are merged into a longer hold"><input type="checkbox" id="dedupe" checked>Merge similar frames</label>
+        <label class="chk tip-left" data-tip="Take every frame of the GIF or video at its own frame rate, instead of sampling"><input type="checkbox" id="allFrames">Every frame</label>
+      </div>
+      <p class="hint" id="allFramesNote" hidden>Sample rate and max frames are ignored; playback uses the source's own frame rate (up to 600 frames).</p>
+      <details id="frameOpts" hidden><summary>more</summary></details>
+    </div>
 
     <!-- 2 VECTORISE -->
-    <section class="step" aria-labelledby="h2s">
-      <h2 id="h2s"><span class="n">02</span>Vectorise<span class="aside" id="traceTime"></span></h2>
+    <div class="pane" id="s2" hidden>
+      <h2>Vectorise <span class="aside" id="traceTime"></span></h2>
       <div class="grid2">
-        <label class="f"><span>Profile</span>
+        <label class="f" data-tip="Ready-made settings. Changing any value below switches to Custom."><span>Profile</span>
           <select id="profile">
             <option value="balanced">Balanced (web, apps)</option>
-            <option value="mcu">LottieMCU lean (small screens)</option>
+            <option value="mcu">LottieMCU lean</option>
             <option value="detail">High detail</option>
             <option value="custom">Custom</option>
           </select>
         </label>
-        <label class="f"><span>Output size</span>
+        <label data-tip="Size of the Lottie canvas. Custom fits and centres the artwork in an exact width × height, e.g. your display." class="f tip-left"><span>Output size</span>
           <select id="csize">
-            <option value="240">Longest side 240 px</option><option value="320">Longest side 320 px</option><option value="480">Longest side 480 px</option>
-            <option value="512" selected>Longest side 512 px</option><option value="800">Longest side 800 px</option>
-            <option value="custom">Custom width × height</option>
+            <option value="240">Longest side 240</option><option value="320">Longest side 320</option><option value="480">Longest side 480</option>
+            <option value="512" selected>Longest side 512</option><option value="800">Longest side 800</option>
+            <option value="custom">Custom W × H</option>
           </select>
         </label>
-        <label class="f"><span>Colours <output id="colsO">8</output></span><input id="cols" type="range" min="2" max="24" value="8"></label>
-        <label class="f"><span>Curve tolerance <output id="tolO">1.0 px</output></span><input id="tol" type="range" min="0.3" max="4" step="0.1" value="1"></label>
-        <label class="f"><span>Drop paths under <output id="omitO">8 px</output></span><input id="omit" type="range" min="0" max="48" value="8"></label>
-        <label class="f"><span>Pre-blur <output id="blurO">0</output></span><input id="blur" type="range" min="0" max="5" value="0"></label>
       </div>
-      <div id="customSize" class="panel" hidden>
-        <div class="grid2">
-          <label class="f"><span>Width (px)</span><input id="cw" type="number" min="16" max="4096" step="1" value="320"></label>
-          <label class="f"><span>Height (px)</span><input id="ch" type="number" min="16" max="4096" step="1" value="240"></label>
-        </div>
-        <div class="row" aria-label="Common display sizes">
-          <button type="button" class="ghost" data-res="240x240">240×240</button>
-          <button type="button" class="ghost" data-res="240x320">240×320</button>
-          <button type="button" class="ghost" data-res="320x240">320×240</button>
-          <button type="button" class="ghost" data-res="320x170">320×170</button>
-          <button type="button" class="ghost" data-res="480x320">480×320</button>
-          <button type="button" class="ghost" data-res="128x128">128×128</button>
-        </div>
-        <p class="hint">The artwork is scaled to fit and centred. Imported Lottie files are placed the same way.</p>
+      <label class="f" data-tip="Classic: smooth ImageTracer curves, good for illustrations and photos. Line art: straight lines and sharp corners, best for icons and logos; can also turn lines into strokes."><span>Tracing engine</span>
+        <select id="engine">
+          <option value="classic" selected>Classic (smooth curves)</option>
+          <option value="lineart">Line art (straight lines, sharp corners)</option>
+        </select>
+      </label>
+      <div id="customSize" class="row" hidden style="flex-wrap:nowrap">
+        <input id="cw" type="number" min="16" max="4096" step="1" value="320" aria-label="Width in pixels" data-tip="Width in pixels" style="width:76px">
+        <span>×</span>
+        <input id="ch" type="number" min="16" max="4096" step="1" value="240" aria-label="Height in pixels" data-tip="Height in pixels" style="width:76px">
+        <select id="resPreset" aria-label="Common display sizes" data-tip="Common display sizes" class="tip-left" style="flex:1">
+          <option value="">Display presets…</option>
+          <option value="240x240">240 × 240 (1.3–1.5″ round/square)</option>
+          <option value="240x320">240 × 320 (2.0–2.4″ portrait)</option>
+          <option value="320x240">320 × 240 (2.0–2.8″, M5Stack)</option>
+          <option value="320x170">320 × 170 (1.9″ ST7789)</option>
+          <option value="480x320">480 × 320 (3.5″)</option>
+          <option value="128x128">128 × 128 (1.4″)</option>
+          <option value="1280x720">1280 × 720 (HD)</option>
+          <option value="1920x1080">1920 × 1080 (Full HD)</option>
+        </select>
       </div>
-      <label class="chk"><input type="checkbox" id="rmbg" checked>Remove background colour (taken from the corners)</label>
-      <label class="chk"><input type="checkbox" id="aaclean" checked>Clean anti-aliased edges</label>
-      <label class="chk"><input type="checkbox" id="strokes" checked>Detect lines as strokes</label>
-      <label class="f" id="smaxWrap"><span>Thickest line treated as a stroke <output id="smaxO">24 px</output></span><input id="smax" type="range" min="4" max="60" value="24"></label>
+      <div class="grid2">
+        <label class="f" data-tip="Most colours kept from the image. Fewer colours give fewer shapes and smaller files."><span>Colours <output id="colsO">8</output></span><input id="cols" type="range" min="2" max="24" value="8"></label>
+        <label data-tip="How far a fitted curve may stray from the traced edge. Higher gives fewer points and smoother, simpler shapes." class="f tip-left"><span>Curve tolerance <output id="tolO">1.0 px</output></span><input id="tol" type="range" min="0.3" max="4" step="0.1" value="1"></label>
+        <label class="f" data-tip="Shapes smaller than this are dropped. Removes specks and noise."><span>Drop paths under <output id="omitO">8 px</output></span><input id="omit" type="range" min="0" max="48" value="8"></label>
+        <label data-tip="Softens the image before tracing. Helps with photos and noisy video." class="f tip-left"><span>Pre-blur <output id="blurO">0</output></span><input id="blur" type="range" min="0" max="5" value="0"></label>
+      </div>
+      <div class="checks">
+        <label class="chk" data-tip="The colour found in the corners is treated as background and left out"><input type="checkbox" id="rmbg" checked>Remove background</label>
+        <label data-tip="Soft edge pixels snap to the neighbouring colours instead of becoming thin sliver shapes" class="chk tip-left"><input type="checkbox" id="aaclean" checked>Clean edges</label>
+        <span id="strokesWrap" hidden><label data-tip="Thin lines of even thickness become single stroked paths instead of filled outlines. Best for icons and line art." class="chk tip-right"><input type="checkbox" id="strokes">Lines as strokes</label></span>
+        <label class="f tip-left" id="smaxWrap" hidden data-tip="Lines thicker than this stay filled shapes"><span>Max stroke <output id="smaxO">24 px</output></span><input id="smax" type="range" min="4" max="60" value="24"></label>
+      </div>
       <div class="swatchbar" id="swatchbar" hidden>
-        <span>Colours found:</span>
+        <span>Colours:</span>
         <div class="swatches" id="swatches"></div>
-      </div>
-      <div class="row" id="swatchActions" hidden>
+        <div class="row" id="swatchActions" hidden>
         <span class="hint" id="swatchSel"></span>
-        <button type="button" id="swMerge">Merge into nearest</button>
-        <button type="button" id="swDelete">Delete</button>
-        <button type="button" class="ghost" id="swReset">Reset colours</button>
+        <button type="button" id="swMerge" data-tip="Remove this colour; its pixels join the closest remaining colour">Merge</button>
+        <button type="button" id="swDelete" data-tip="Leave this colour out of the result">Delete</button>
+        <button type="button" class="ghost" id="swReset" data-tip="Undo all colour edits">Reset</button>
+        </div>
       </div>
       <div class="progress" aria-hidden="true"><i id="prog"></i></div>
-    </section>
+    </div>
 
     <!-- 3 MOTION -->
-    <section class="step" aria-labelledby="h3s">
-      <h2 id="h3s"><span class="n">03</span>Motion</h2>
-      <div id="motionImage">
+    <div class="pane" id="s3" hidden>
+      <h2>Motion</h2>
+      <div id="motionImage" style="display:flex;flex-direction:column;gap:8px">
         <div class="grid2">
-          <label class="f"><span>Whole artwork</span><select id="allPreset"></select></label>
-          <label class="f"><span>Loop length <output id="loopO">3.0 s</output></span><input id="loop" type="range" min="0.5" max="10" step="0.5" value="3"></label>
+          <label class="f" data-tip="A preset motion for the whole artwork"><span>Whole artwork</span><select id="allPreset"></select></label>
+          <label data-tip="Length of one loop" class="f tip-left"><span>Loop length <output id="loopO">3.0 s</output></span><input id="loop" type="range" min="0.5" max="10" step="0.5" value="3"></label>
         </div>
-        <div class="partsel" style="margin-top:10px">
-          <label class="f" style="flex:1"><span>Part <b class="tag" id="partTag">none selected</b></span><select id="partPreset" disabled></select></label>
-          <p class="hint" style="flex-basis:100%">Open the <b>Parts</b> tab and click a numbered box to animate one piece on its own.</p>
-        </div>
+        <label class="f partsel" data-tip="Open the Parts view and click a numbered box, then choose its motion here"><span>Part <b class="tag" id="partTag">none selected</b></span><select id="partPreset" disabled></select></label>
+        <p class="hint">Click a numbered box in the <b>Parts</b> view to animate one piece on its own.</p>
       </div>
-      <div id="motionFrames" hidden>
-        <label class="f"><span>Frames become</span>
+      <div id="motionFrames" hidden style="display:flex;flex-direction:column;gap:8px">
+        <label class="f" data-tip="Flipbook: every frame is its own vector layer (exact, larger). Smart motion: shapes are tracked and keyframed (smaller, smooth)."><span>Frames become</span>
           <select id="motionMode">
-            <option value="smart" selected>Smart motion: shapes tracked and keyframed</option>
-            <option value="flip">Flipbook: one vector layer per frame</option>
+            <option value="flip" selected>Flipbook: one vector layer per frame</option>
+            <option value="smart">Smart motion: tracked and keyframed</option>
           </select>
         </label>
         <p class="hint" id="motionInfo"></p>
-        <label class="f" style="margin-top:6px"><span>Whole artwork</span><select id="allPresetF"></select></label>
+        <label class="f" data-tip="A preset motion added on top of the frames"><span>Whole artwork</span><select id="allPresetF"></select></label>
       </div>
-      <div id="motionLottie" hidden>
+      <div id="motionLottie" hidden style="display:flex;flex-direction:column;gap:8px">
         <p class="hint" id="lottieInfo"></p>
-        <div class="row">
-          <button type="button" id="rebuildBtn">Rebuild as smart motion</button>
-        </div>
-        <p class="hint">Renders every sampled frame and traces it again with tracked shapes. Use it for flipbook-style or image-based Lottie files.</p>
+        <div class="row"><button type="button" id="rebuildBtn" data-tip="Render every sampled frame and trace it again with tracked shapes. Use it for flipbook-style or image-based Lottie files.">Rebuild as smart motion</button></div>
       </div>
-    </section>
+    </div>
 
     <!-- 4 EXPORT -->
-    <section class="step" aria-labelledby="h4s">
-      <h2 id="h4s"><span class="n">04</span>Optimise and export</h2>
+    <div class="pane" id="s4" hidden>
+      <h2>Optimise and export</h2>
       <div class="grid2">
-        <label class="f"><span>Frame rate</span>
+        <label class="f" data-tip="Frames per second written into the Lottie"><span>Frame rate</span>
           <select id="fps"><option>12</option><option>15</option><option selected>24</option><option>30</option><option>60</option></select>
         </label>
-        <label class="f"><span>Coordinate decimals</span>
+        <label data-tip="Decimal places kept on coordinates. Fewer decimals give smaller JSON." class="f tip-left"><span>Decimals</span>
           <select id="prec"><option value="0">0 (smallest)</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option></select>
         </label>
       </div>
-      <label class="chk"><input type="checkbox" id="strip">Strip layer and shape names</label>
-      <div id="lottieOpts" hidden>
-        <label class="chk"><input type="checkbox" id="optHidden" checked>Remove hidden layers and shapes</label>
-        <label class="chk"><input type="checkbox" id="optTiny" checked>Remove paths smaller than the drop size</label>
-        <label class="chk"><input type="checkbox" id="optRefit">Refit curves with fewer points (uses curve tolerance)</label>
+      <label class="chk" data-tip="Remove layer and shape names. Saves space; players don't need them."><input type="checkbox" id="strip">Strip names</label>
+      <div id="lottieOpts" hidden class="checks">
+        <label class="chk" data-tip="Remove layers and shapes that are switched off"><input type="checkbox" id="optHidden" checked>Hidden layers</label>
+        <label data-tip="Remove paths smaller than the drop size from step 02" class="chk tip-left"><input type="checkbox" id="optTiny" checked>Tiny paths</label>
+        <label class="chk" data-tip="Refit curves with fewer points, using the curve tolerance from step 02"><input type="checkbox" id="optRefit">Refit curves</label>
       </div>
       <div class="row">
-        <button class="primary" id="dlJson" type="button">Download .json</button>
-        <button class="primary" id="dlLottie" type="button">Download .lottie</button>
-        <button id="copyJson" type="button">Copy JSON</button>
+        <button class="primary" id="dlJson" type="button" data-tip="Lottie JSON for web and app players">.json</button>
+        <button class="primary" id="dlLottie" type="button" data-tip="dotLottie: the same animation zipped, usually 3–8× smaller">.lottie</button>
+        <button id="copyJson" type="button" data-tip="Copy the Lottie JSON to the clipboard">Copy JSON</button>
       </div>
-
       <div class="panel" id="mcuPanel">
-        <h3>LottieMCU <span class="chip">LMC1 1.1.0</span></h3>
-        <label class="f"><span>Array name</span><input id="arrName" type="text" value="anim" spellcheck="false" autocomplete="off"></label>
-        <div class="row">
-          <button class="primary" id="dlH" type="button">Download .h</button>
-          <button id="dlLmc" type="button">Download .lmc</button>
+        <h3>LottieMCU <span class="chip" data-tip="Binary format of LottieMCU 1.1.0, identical to tools/lottie2mcu.py">LMC1 1.1.0</span></h3>
+        <div class="row" style="flex-wrap:nowrap">
+          <label class="f" style="flex:1" data-tip="Name of the C array in the header"><span>Array name</span><input id="arrName" type="text" value="anim" spellcheck="false" autocomplete="off"></label>
+          <button class="primary" id="dlH" type="button" style="align-self:end" data-tip="C header with a PROGMEM array. #include it in your sketch, then call lottie.begin(array, width, height).">.h</button>
+          <button id="dlLmc" type="button" style="align-self:end" data-tip="Raw binary for loading from LittleFS or SD" class="tip-left">.lmc</button>
         </div>
         <dl class="kv" id="mcuKv"></dl>
         <ul class="warnlist" id="mcuWarn"></ul>
-        <p class="hint">Same binary as <code>lottie2mcu.py</code>. Include the header and call <code>lottie.begin(<span id="arrEcho">anim</span>, w, h)</code>.</p>
+        <span id="arrEcho" hidden>anim</span>
       </div>
-
       <details>
-        <summary>Batch convert</summary>
+        <summary data-tip="Convert several files with these settings into one .zip">Batch convert</summary>
         <div class="inner">
-          <p class="hint">Converts several files with the current settings and saves them in one .zip.</p>
           <div class="row">
             <label class="chk"><input type="checkbox" id="bJson" checked>.json</label>
             <label class="chk"><input type="checkbox" id="bLottie">.lottie</label>
             <label class="chk"><input type="checkbox" id="bH" checked>.h</label>
             <label class="chk"><input type="checkbox" id="bLmc">.lmc</label>
           </div>
-          <label class="drop" for="batchIn" style="padding:12px"><strong>Choose files to convert</strong><input id="batchIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden></label>
+          <label class="drop" for="batchIn"><strong>Choose files to convert</strong><input id="batchIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden></label>
           <div class="status" id="batchStatus" role="status"></div>
         </div>
       </details>
       <div class="status" id="exStatus" role="status"></div>
-    </section>
-  </div>
+    </div>
+  </section>
 
   <!-- STAGE -->
-  <div class="stage">
-    <div class="tabs" role="tablist">
-      <button type="button" role="tab" aria-selected="true" data-tab="lottie">Lottie</button>
-      <button type="button" role="tab" aria-selected="false" data-tab="source">Source</button>
-      <button type="button" role="tab" aria-selected="false" data-tab="parts">Parts</button>
+  <section class="stage" aria-label="Preview">
+    <div class="stagebar" role="tablist">
+      <div class="seg">
+        <button type="button" role="tab" aria-selected="true" data-tab="lottie" data-tip="The finished vector animation">Lottie</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="source" data-tip="The original picture and sampled frames">Source</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="parts" data-tip="Numbered parts of an image or SVG. Click one to animate it.">Parts</button>
+      </div>
+      <span class="chip" id="resLabel" data-tip="Exact pixel size of the exported animation"></span>
       <span class="sp"></span>
+      <select id="zoom" style="width:auto" data-tip="Preview size. Auto shows actual pixels when the animation fits, otherwise fits it to the panel." aria-label="Preview zoom">
+        <option value="auto" selected>Auto</option><option value="fit">Fit</option><option value="0.5">50%</option><option value="1">100%</option><option value="2">200%</option><option value="3">300%</option>
+      </select>
       <div class="bgsw" aria-label="Preview background">
-        <button type="button" data-bg="checker" aria-pressed="true" title="Transparent" style="background:repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 50%/10px 10px"></button>
-        <button type="button" data-bg="light" aria-pressed="false" title="White" style="background:#fff"></button>
-        <button type="button" data-bg="dark" aria-pressed="false" title="Black" style="background:#0b0f12"></button>
+        <button type="button" data-bg="checker" aria-pressed="true" data-tip="Transparent background" class="tip-left" style="background:repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 50%/10px 10px"></button>
+        <button type="button" data-bg="light" aria-pressed="false" data-tip="White background" class="tip-left" style="background:#fff"></button>
+        <button type="button" data-bg="dark" aria-pressed="false" data-tip="Black background" class="tip-left" style="background:#0b0f12"></button>
       </div>
     </div>
     <div class="view" id="v-lottie">
-      <div class="scrollbox"><div class="canvasbox checker" id="lottieWrap"><div id="lottieBox" style="width:100%;height:100%;display:grid;place-items:center"></div><div class="busy" id="busy" hidden></div></div></div>
+      <div class="scrollbox" id="scrollbox"><div class="canvasbox checker" id="lottieWrap"><div id="lottieBox" style="width:100%;height:100%;display:grid;place-items:center"></div><div class="busy" id="busy" hidden></div></div></div>
       <div class="transport">
-        <button type="button" id="playBtn">Pause</button>
+        <button type="button" id="playBtn" data-tip="Play / pause" aria-label="Pause" class="icon tip-up"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg></button>
         <input type="range" id="scrub" min="0" max="100" value="0" aria-label="Scrub timeline">
         <span class="tc" id="tc">0 / 0</span>
       </div>
-      <div class="transport">
-        <span class="chip" id="resLabel"></span>
-        <span style="flex:1"></span>
-        <label class="f" style="flex-direction:row;align-items:center;gap:8px"><span>Zoom</span>
-          <select id="zoom" style="width:auto">
-            <option value="fit">Fit to panel</option><option value="0.5">50%</option><option value="1" selected>100% (actual size)</option><option value="2">200%</option><option value="3">300%</option>
-          </select>
-        </label>
-      </div>
     </div>
     <div class="view" id="v-source" hidden>
-      <div class="canvasbox checker"><canvas id="srcCanvas"></canvas></div>
+      <div class="fitbox canvasbox checker"><canvas id="srcCanvas"></canvas></div>
       <div class="filmstrip" id="film"></div>
     </div>
     <div class="view" id="v-parts" hidden>
-      <div class="canvasbox checker"><canvas id="partsCanvas"></canvas></div>
-      <p class="hint" style="margin-top:8px" id="partsHint">Load an image or SVG to see its parts.</p>
+      <div class="fitbox canvasbox checker"><canvas id="partsCanvas"></canvas></div>
+      <p class="hint" id="partsHint">Load an image or SVG to see its parts.</p>
     </div>
     <dl class="stats">
-      <div><dt>File size</dt><dd id="stSize">–</dd></div>
-      <div><dt>Gzipped</dt><dd id="stGz">–</dd></div>
-      <div><dt>Vertices</dt><dd id="stVerts">–</dd></div>
-      <div><dt>Keyframes</dt><dd id="stKeys">–</dd></div>
-      <div><dt>Layers</dt><dd id="stLayers">–</dd></div>
-      <div><dt>Paths</dt><dd id="stPaths">–</dd></div>
-      <div><dt>Duration</dt><dd id="stDur">–</dd></div>
-      <div><dt>Canvas</dt><dd id="stCanvas">–</dd></div>
+      <div data-tip="Size of the Lottie JSON. The arrow compares with your previous settings."><dt>JSON</dt><dd id="stSize">–</dd></div>
+      <div data-tip="Gzipped size, close to what a .lottie or web server transfer costs"><dt>Gzipped</dt><dd id="stGz">–</dd></div>
+      <div data-tip="Total path points"><dt>Vertices</dt><dd id="stVerts">–</dd></div>
+      <div data-tip="Animated keyframes"><dt>Keys</dt><dd id="stKeys">–</dd></div>
+      <div data-tip="Layers in the animation"><dt>Layers</dt><dd id="stLayers">–</dd></div>
+      <div data-tip="Vector paths"><dt>Paths</dt><dd id="stPaths">–</dd></div>
+      <div data-tip="Length of the animation"><dt>Duration</dt><dd id="stDur">–</dd></div>
+      <div data-tip="Canvas size in pixels" class="tip-left"><dt>Canvas</dt><dd id="stCanvas">–</dd></div>
     </dl>
-    <div class="features" id="features"></div>
+    <div class="infoline"><div class="features" id="features"></div></div>
     <ul class="notes" id="notes"></ul>
-  </div>
+  </section>
 </main>
 
 <footer class="foot">
   <span>© 2026 Jobit Joseph. All rights reserved.</span>
-  <span>Includes lottie-web (MIT licence, © 2015 Bodymovin) and imagetracerjs (public domain).</span>
+  <span>Includes lottie-web (MIT, © 2015 Bodymovin) and imagetracerjs (public domain).</span>
 </footer>
 
 <!--
@@ -2274,19 +2315,75 @@ var Core = (function () {
           const probe = add(V, mul(outer, hw * 1.25 + 0.5));
           if (inside(...probe)) miterVotes++; else roundVotes++;
         }
+        // remove hooks: short end pieces or zig-zags that turn back sharply (junction leftovers of thinning)
+        {
+          const isLn = z => dist(z[1], z[0]) < 1e-9 && dist(z[2], z[3]) < 1e-9;
+          const turnAt = (A, B) => { const u = norm(sub(A[3], A[0])), v = norm(sub(B[3], B[0])); return Math.acos(Math.max(-1, Math.min(1, dot(u, v)))) * 180 / Math.PI; };
+          const short = z => dist(z[0], z[3]) < width * 1.6;
+          let guard = 0, changed = true;
+          while (changed && segs.length > 1 && guard++ < 200) {
+            changed = false;
+            if (!l.closed) {
+              if (isLn(segs[0]) && short(segs[0]) && turnAt(segs[0], segs[1]) > 60) { segs.shift(); changed = true; continue; }
+              const L = segs.length;
+              if (isLn(segs[L - 1]) && short(segs[L - 1]) && turnAt(segs[L - 2], segs[L - 1]) > 60) { segs.pop(); changed = true; continue; }
+            }
+            for (let q = 1; q < segs.length - 1; q++) {
+              const A = segs[q - 1], S = segs[q], B = segs[q + 1];
+              if (!isLn(A) || !isLn(S) || !isLn(B) || !short(S)) continue;
+              if (turnAt(A, S) > 60 && turnAt(S, B) > 60) {
+                const M = mul(add(S[0], S[3]), 0.5);
+                segs[q - 1] = [A[0], A[0], M, M]; segs[q + 1] = [M, M, B[3], B[3]]; segs.splice(q, 1); changed = true; break;
+              }
+            }
+          }
+          segs = mergeCollinear(segs, l.closed, eps * 0.7);
+        }
+        // a stroke piece shorter than the line is thick only draws a dot: skip it
+        { let L = 0; for (const z of segs) L += dist(z[0], z[3]); if (L < width * 1.5) continue; }
         const off = p => [p[0] + x0 - 1, p[1] + y0 - 1];
         segs = segs.map(z => z.map(off));
         subs.push(toLottiePath(segs, l.closed, o.prec));
         for (const z of segs) for (const p of [z[0], z[3]]) { bb[0] = Math.min(bb[0], p[0]); bb[1] = Math.min(bb[1], p[1]); bb[2] = Math.max(bb[2], p[0]); bb[3] = Math.max(bb[3], p[1]); }
       }
-      const lj = miterVotes > roundVotes ? 1 : 2, lc = buttVotes > capRoundVotes ? 1 : 2;
+      // sharp joins only with clear evidence (miter spikes look worse than slightly round corners)
+      const lj = miterVotes >= 3 && miterVotes > roundVotes * 2 ? 1 : 2, lc = buttVotes >= 2 && buttVotes > capRoundVotes * 2 ? 1 : 2;
       if (!subs.length) continue;
       if (bb[2] - bb[0] < o.minSide && bb[3] - bb[1] < o.minSide) continue;
-      items.push({ kind: "stroke", k, color, alpha, subs, width: Math.round(width * 10) / 10, lj, lc, ml: 4, bbox: bb, area: (bb[2] - bb[0]) * (bb[3] - bb[1]) });
+      items.push({ kind: "stroke", k, color, alpha, subs, width: Math.round(width * 10) / 10, lj, lc, ml: 2, bbox: bb, area: (bb[2] - bb[0]) * (bb[3] - bb[1]) });
       for (const i of comp) ii.array[((i / W) | 0) + 1][(i % W) + 1] = -2;
     }
   }
 
+  // ImageTracer segments (L = line, Q = quadratic) -> Lottie cubic path, dropping collinear points
+  function classicPath(segs, prec) {
+    const v = [], ii = [], oo = [];
+    const m = Math.pow(10, prec), rp = x => Math.round(x * m) / m;
+    for (const sg of segs) {
+      if (!v.length) { v.push([sg.x1, sg.y1]); ii.push([0, 0]); oo.push([0, 0]); }
+      const p0 = v[v.length - 1];
+      if (sg.type === "Q") {
+        oo[oo.length - 1] = [(sg.x2 - p0[0]) * 2 / 3, (sg.y2 - p0[1]) * 2 / 3];
+        v.push([sg.x3, sg.y3]); ii.push([(sg.x2 - sg.x3) * 2 / 3, (sg.y2 - sg.y3) * 2 / 3]); oo.push([0, 0]);
+      } else { v.push([sg.x2, sg.y2]); ii.push([0, 0]); oo.push([0, 0]); }
+    }
+    if (v.length > 2) {
+      const a = v[0], b = v[v.length - 1];
+      if (Math.abs(a[0] - b[0]) < 0.01 && Math.abs(a[1] - b[1]) < 0.01) { ii[0] = ii[ii.length - 1]; v.pop(); ii.pop(); oo.pop(); }
+    }
+    const z = q => Math.abs(q[0]) < 1e-6 && Math.abs(q[1]) < 1e-6;
+    let changed = true;
+    while (changed && v.length > 3) {
+      changed = false;
+      for (let k = 0; k < v.length && v.length > 3; k++) {
+        const n = v.length, a = (k - 1 + n) % n, b = (k + 1) % n;
+        if (!(z(ii[k]) && z(oo[k]) && z(oo[a]) && z(ii[b]))) continue;
+        const dx = v[b][0] - v[a][0], dy = v[b][1] - v[a][1], L = Math.hypot(dx, dy) || 1;
+        if (Math.abs((v[k][0] - v[a][0]) * dy - (v[k][1] - v[a][1]) * dx) / L < 0.35) { v.splice(k, 1); ii.splice(k, 1); oo.splice(k, 1); changed = true; k--; }
+      }
+    }
+    return { i: ii.map(q => q.map(rp)), o: oo.map(q => q.map(rp)), v: v.map(q => q.map(rp)), c: true };
+  }
   function internodePoints(path) { return path.points.map(p => [p.x, p.y]); }
 
   /* ---------- main entry ---------- */
@@ -2305,7 +2402,7 @@ var Core = (function () {
     const deleted = k => o.deleted && o.deleted.some(m => rgbDist(palette[k], m) < 6);
     const items = [];
     const strokeItems = [];
-    if (o.strokes) {
+    if (o.strokes && o.engine !== "classic") {
       palette.forEach((col, k) => {
         if (col.a < 32 || k === bg || deleted(k)) return;
         extractStrokes(ii, k, W, H, o, strokeItems, [col.r / 255, col.g / 255, col.b / 255], col.a / 255);
@@ -2316,19 +2413,21 @@ var Core = (function () {
       const layer = IT.layeringstep(ii, k);
       const paths = IT.pathscan(layer, o.pathomit ?? 8);
       const ins = IT.internodes(paths, { rightangleenhance: true });
-      ins.forEach(path => {
+      // Classic style = the first version: ImageTracer's own line/curve fitting of the outlines
+      const classic = o.engine === "classic" ? IT.batchtracepaths(ins, o.tol, o.tol) : null;
+      ins.forEach((path, pi) => {
         if (path.isholepath || path.points.length < 3) return;
         const bb = path.boundingbox;
         if (bb[2] - bb[0] < o.minSide && bb[3] - bb[1] < o.minSide) return;
         const fe = Math.max(0.6, o.tol * 0.75);
-        const fitP = P => toLottiePath(fitLineArt(smooth(P, true, 1), true, fe, fe * 1.5), true, o.prec);
+        const fitP = classic ? (P, idx) => classicPath(classic[idx].segments, o.prec) : P => toLottiePath(fitLineArt(smooth(P, true, 1), true, fe, fe * 1.5), true, o.prec);
         const areaOf = P => { let a = 0; for (let q = 0; q < P.length; q++) { const u = P[q], w2 = P[(q + 1) % P.length]; a += u[0] * w2[1] - w2[0] * u[1]; } return Math.abs(a) / 2; };
         if (areaOf(internodePoints(path)) < Math.max(4, o.minSide * o.minSide * 0.35)) return;
-        const subs = [fitP(internodePoints(path))];
+        const subs = [fitP(internodePoints(path), pi)];
         for (const h of path.holechildren) if (ins[h] && ins[h].points.length >= 3) {
           const hb = ins[h].boundingbox;
           if (hb[2] - hb[0] < o.minSide * 0.5 && hb[3] - hb[1] < o.minSide * 0.5) continue;
-          subs.push(fitP(internodePoints(ins[h])));
+          subs.push(fitP(internodePoints(ins[h]), h));
         }
         const s0 = subs[0];
         if (s0.v.length < 2 || (s0.v.length === 2 && s0.i.concat(s0.o).every(h => !h[0] && !h[1]))) return;
@@ -2769,6 +2868,19 @@ var Motion = (function () {
           });
         });
       }
+      // In-between frames are linear blends of matching vertices. If vertices travel much further than the
+      // outline itself moved, the blend would sweep through a blob: redraw per frame instead.
+      if (structured) {
+        const near = (A, B) => { let mx = 0; for (let i = 0; i < A.length; i += 3) { let m = Infinity; for (let j = 0; j < B.length; j += 2) { const d = (A[i][0] - B[j][0]) ** 2 + (A[i][1] - B[j][1]) ** 2; if (d < m) m = d; } mx = Math.max(mx, m); } return Math.sqrt(mx); };
+        for (let n = 1; n < tr.items.length && structured; n++) {
+          for (let q = 0; q < ref.subs.length && structured; q++) {
+            const P0 = shapes[n - 1][q], P1 = shapes[n][q];
+            let move = 0; for (let j = 0; j < P1.v.length; j++) move = Math.max(move, Math.hypot(P1.v[j][0] - P0.v[j][0], P1.v[j][1] - P0.v[j][1]));
+            const outline = Math.max(near(dense[n - 1][q], dense[n][q]), near(dense[n][q], dense[n - 1][q]));
+            if (move > outline * 2 + Math.max(3, tol * 3)) structured = false;
+          }
+        }
+      }
       if (!structured) {
         // fall back to evenly spaced points (larger, but follows any change of shape)
         const step2 = Math.max(2.5, tol * 2.5);
@@ -2788,8 +2900,8 @@ var Motion = (function () {
       });
       if (!structured) {
         // evenly spaced points can cost more than simply redrawing each frame: keep whichever is smaller
-        const flipBytes = tr.items.reduce((sz, e) => sz + JSON.stringify(e.item.subs).length + 120, 0);
-        if (JSON.stringify(subsAnim).length > flipBytes) {
+        // evenly spaced point morphs can turn into blobs when an outline changes topology: redraw per frame instead
+        {
           tr.items.forEach((e, n) => {
             const a = frameNo(e.f), b = n === tr.items.length - 1 ? endNo(e.f) : frameNo(tr.items[n + 1].f);
             out.push({ item: e.item, subs: e.item.subs, tr: null, vis: visibility(a, b) });
@@ -3680,25 +3792,25 @@ function traceAsync(imgd, opts) {
 
 /* ---------------- settings ---------------- */
 const PROFILES = {
-  balanced: { share: 0.004, cols: 8, tol: 1, omit: 8, blur: 0, prec: 1, strip: false, csize: 512, fps: 24, maxf: 24, sfps: 10, strokes: true, aa: true },
-  mcu:      { share: 0.01, cols: 4, tol: 1.5, omit: 10, blur: 1, prec: 1, strip: true, csize: 240, fps: 24, maxf: 16, sfps: 8, strokes: true, aa: true },
-  detail:   { share: 0.0015, cols: 16, tol: 0.5, omit: 4, blur: 0, prec: 2, strip: false, csize: 800, fps: 30, maxf: 60, sfps: 15, strokes: true, aa: true }
+  balanced: { share: 0.004, cols: 8, tol: 1, omit: 8, blur: 0, prec: 1, strip: false, csize: 512, fps: 24, maxf: 24, sfps: 10, strokes: false, aa: true },
+  mcu:      { share: 0.01, cols: 4, tol: 1.5, omit: 10, blur: 1, prec: 1, strip: true, csize: 240, fps: 24, maxf: 16, sfps: 8, strokes: false, aa: true },
+  detail:   { share: 0.0015, cols: 16, tol: 0.5, omit: 4, blur: 0, prec: 2, strip: false, csize: 800, fps: 30, maxf: 60, sfps: 15, strokes: false, aa: true }
 };
 function settings() {
   return {
     cs: $("#csize").value === "custom" ? 512 : +$("#csize").value, custom: $("#csize").value === "custom",
     W: Math.max(16, Math.min(4096, Math.round(+$("#cw").value || 320))), H: Math.max(16, Math.min(4096, Math.round(+$("#ch").value || 240))),
     maxColors: +$("#cols").value, tol: +$("#tol").value, minSide: +$("#omit").value, blur: +$("#blur").value,
-    rmbg: $("#rmbg").checked, aaclean: $("#aaclean").checked, strokes: $("#strokes").checked, strokeMax: +$("#smax").value,
+    engine: $("#engine").value, rmbg: $("#rmbg").checked, aaclean: $("#aaclean").checked, strokes: $("#strokes").checked, strokeMax: +$("#smax").value,
     minShare: S.minShare, prec: +$("#prec").value, fps: +$("#fps").value, strip: $("#strip").checked,
-    sfps: +$("#sfps").value, maxf: +$("#maxf").value, dedupe: $("#dedupe").checked, trimA: Math.max(0, +$("#trimA").value || 0), trimB: Math.max(0, +$("#trimB").value || 0),
+    sfps: +$("#sfps").value, maxf: +$("#maxf").value, dedupe: $("#dedupe").checked, allFrames: $("#allFrames").checked, trimA: Math.max(0, +$("#trimA").value || 0), trimB: Math.max(0, +$("#trimB").value || 0),
     motionMode: $("#motionMode").value, loop: +$("#loop").value,
     allPreset: (S.base && S.base.mode === "frames") ? $("#allPresetF").value : $("#allPreset").value,
     optHidden: $("#optHidden").checked, optTiny: $("#optTiny").checked, optRefit: $("#optRefit").checked
   };
 }
 function traceOpts(st, extra) {
-  return { maxColors: st.maxColors, minShare: st.minShare, aaclean: st.aaclean, blur: st.blur, tol: st.tol, minSide: st.minSide,
+  return { engine: st.engine, maxColors: st.maxColors, minShare: st.minShare, aaclean: st.aaclean, blur: st.blur, tol: st.tol, minSide: st.minSide,
     rmbg: st.rmbg, strokes: st.strokes, strokeMax: st.strokeMax, prec: Math.max(1, st.prec), pathomit: Math.max(4, Math.round(st.minSide)),
     mergeOut: S.edits.merge, deleted: S.edits.del, ...(extra || {}) };
 }
@@ -3741,8 +3853,14 @@ async function frameFromImageFile(f) {
   const img = await imageFromBlob(f);
   return toCanvas(img, img.naturalWidth || 512, img.naturalHeight || 512, 1024);
 }
-function sampleTimes(t0, t1, st) {
+const MAX_ALL_FRAMES = 600;
+function sampleTimes(t0, t1, st, rate) {
   const total = Math.max(0.01, t1 - t0);
+  if (st.allFrames && rate) {
+    // every frame at the source's own rate
+    const step = 1 / rate, n = Math.max(1, Math.min(MAX_ALL_FRAMES, Math.round(total / step)));
+    return Array.from({ length: n }, (_, i) => t0 + i * step);
+  }
   const n = Math.max(1, Math.min(st.maxf, Math.ceil(total * st.sfps)));
   return Array.from({ length: n }, (_, i) => t0 + i * total / n);
 }
@@ -3768,6 +3886,14 @@ async function framesFromAnimatedImage(f, st) {
     }
     dec.close();
     const [a, b] = trimRange(t, st);
+    if (st.allFrames) {
+      // every decoded frame with its own delay, clipped to the trim range
+      const out = all.filter(x => x.t + x.d > a + 1e-6 && x.t < b - 1e-6).slice(0, MAX_ALL_FRAMES)
+        .map(x => { const t0 = Math.max(x.t, a), t1 = Math.min(x.t + x.d, b); return { c: x.c, t: t0 - a, d: t1 - t0 }; });
+      const ds = out.map(x => x.d).sort((p, q) => p - q);
+      out.rate = ds.length ? 1 / ds[Math.floor(ds.length / 2)] : 0;
+      return out;
+    }
     const times = sampleTimes(a, b, st);
     return times.map((tt, i) => {
       let fr = all[0]; for (const x of all) { if (x.t <= tt + 1e-6) fr = x; else break; }
@@ -3784,7 +3910,8 @@ async function framesFromVideo(f, st) {
     const total = v.duration;
     if (!isFinite(total) || total <= 0) throw new Error("Couldn't read the video length.");
     const [a, b] = trimRange(total, st);
-    const times = sampleTimes(a, b, st), out = [];
+    const times = sampleTimes(a, b, st, st.fps), out = [];
+    if (st.allFrames) out.rate = st.fps;
     for (let i = 0; i < times.length; i++) {
       await new Promise(res => { const to = setTimeout(res, 2000); v.onseeked = () => { clearTimeout(to); res(); }; v.currentTime = Math.min(Math.max(times[i], 0.001), total - 0.01); });
       out.push({ c: toCanvas(v, v.videoWidth, v.videoHeight, 1024), t: times[i] - a, d: (i < times.length - 1 ? times[i + 1] : b) - times[i] });
@@ -3826,10 +3953,10 @@ async function loadSource(files, st) {
     return { kind: "frames", name: media.length + " images", files: media, raw: dedupeFrames(raw, st) };
   }
   const f = media[0];
-  if (f.type.startsWith("video/")) { const raw = dedupeFrames(await framesFromVideo(f, st), st); return { kind: raw.length > 1 ? "frames" : "image", name: f.name, files: media, raw }; }
+  if (f.type.startsWith("video/")) { const fr = await framesFromVideo(f, st); const raw = dedupeFrames(fr, st); return { kind: raw.length > 1 ? "frames" : "image", name: f.name, files: media, raw, rate: fr.rate }; }
   if (/gif|webp|apng/.test(f.type)) {
     const an = await framesFromAnimatedImage(f, st);
-    if (an) { const raw = dedupeFrames(an, st); return { kind: raw.length > 1 ? "frames" : "image", name: f.name, files: media, raw }; }
+    if (an) { const raw = dedupeFrames(an, st); return { kind: raw.length > 1 ? "frames" : "image", name: f.name, files: media, raw, rate: an.rate }; }
     const note = (f.type === "image/gif" && !("ImageDecoder" in window)) ? "This browser can't decode GIF frames (try Chrome or Edge), so only the first frame was used." : "";
     return { kind: "image", name: f.name, files: media, raw: [{ c: await frameFromImageFile(f), t: 0, d: 0 }], note };
   }
@@ -4251,7 +4378,8 @@ async function renderLottieFrames(anim, st) {
     await new Promise(r => setTimeout(r, 50));
     const cv = host.querySelector("canvas");
     const [a, b] = trimRange(total, st);
-    const times = sampleTimes(a, b, st), out = [];
+    const times = sampleTimes(a, b, st, fr), out = [];
+    if (st.allFrames) out.rate = fr;
     for (let i = 0; i < times.length; i++) {
       an.goToAndStop(ip + times[i] * fr, true);
       const c = mkCanvas(cv.width, cv.height); c.getContext("2d").drawImage(cv, 0, 0);
@@ -4420,7 +4548,6 @@ function drawParts() {
     x.fillStyle = sel ? "#d97706" : "#0a7570"; x.fillRect(x0, y0, tw, fs + 6);
     x.fillStyle = "#ffffff"; x.fillText(p.id, x0 + 4, y0 + fs + 1);
   });
-  c.parentElement.style.aspectRatio = c.width + " / " + c.height;
 }
 $("#partsCanvas").addEventListener("click", e => {
   if (!S.base || S.base.mode !== "image") return;
@@ -4445,7 +4572,6 @@ function drawSource() {
   const f0 = raw[0].c;
   c.width = f0.width; c.height = f0.height;
   c.getContext("2d").drawImage(f0, 0, 0);
-  c.parentElement.style.aspectRatio = f0.width + " / " + f0.height;
   if (raw.length > 1) raw.slice(0, 60).forEach((r, i) => {
     const t = mkCanvas(Math.round(54 * r.c.width / r.c.height), 54);
     t.getContext("2d").drawImage(r.c, 0, 0, t.width, t.height);
@@ -4550,17 +4676,16 @@ function play(L) {
 // Preview at the output's own pixel size (or scaled), scrolling when it is larger than the panel.
 function applyZoom(L) {
   L = L || S.lottie;
-  const wrap = $("#lottieWrap"), z = $("#zoom").value;
+  const wrap = $("#lottieWrap"), z = $("#zoom").value, box = $("#scrollbox");
   const w = (L && +L.w) || 1, h = (L && +L.h) || 1;
   $("#resLabel").textContent = L ? `${w} × ${h} px` : "";
-  if (z === "fit" || !L) {
-    wrap.style.width = "100%"; wrap.style.height = ""; wrap.style.maxHeight = ""; wrap.style.aspectRatio = w + " / " + h;
-  } else {
-    const k = +z;
-    wrap.style.aspectRatio = "auto"; wrap.style.maxHeight = "none";
-    wrap.style.width = Math.round(w * k) + "px"; wrap.style.height = Math.round(h * k) + "px";
-  }
+  if (!L) { wrap.style.width = "100%"; wrap.style.height = "100%"; return; }
+  const aw = Math.max(40, box.clientWidth - 2), ah = Math.max(40, box.clientHeight - 2);
+  const fitK = Math.min(aw / w, ah / h);
+  const k = z === "fit" ? fitK : z === "auto" ? Math.min(1, fitK) : +z;
+  wrap.style.width = Math.max(1, Math.floor(w * k)) + "px"; wrap.style.height = Math.max(1, Math.floor(h * k)) + "px";
 }
+if ("ResizeObserver" in window) new ResizeObserver(() => applyZoom()).observe($("#scrollbox"));
 $("#zoom").addEventListener("change", () => { LS.set("zoom", $("#zoom").value); applyZoom(); });
 async function gzSize(str) {
   if (!("CompressionStream" in window)) return null;
@@ -4734,15 +4859,29 @@ async function openFiles(files) {
     const base = baseName(src.name);
     $("#arrName").value = LMC.safeName(base); $("#arrEcho").textContent = LMC.safeName(base);
     if (src.note) setStatus($("#srcStatus"), src.note, "err");
+    matchSourceRate(src);
     await reprocess();
   } catch (e) { console.error(e); setStatus($("#srcStatus"), e.message || String(e), "err"); setProg(0); }
   finally { busy(null); }
+}
+// With "every frame", play back at the source's own frame rate so each frame keeps its timing.
+function matchSourceRate(src) {
+  if (!src || !src.rate || !$("#allFrames").checked) return;
+  const r = Math.max(1, Math.min(60, Math.round(src.rate)));
+  const sel = $("#fps");
+  if (![...sel.options].some(o => +o.value === r)) {
+    const o = document.createElement("option"); o.value = String(r); o.textContent = r + " (source)";
+    const after = [...sel.options].find(x => +x.value > r);
+    sel.insertBefore(o, after || null);
+  }
+  sel.value = String(r);
 }
 function updateSrcInfo() {
   const s = S.src;
   const label = !s ? "empty" : s.kind === "frames" ? s.raw.length + " frames" : s.kind === "svg" ? "svg" : s.kind === "lottie" ? "lottie" : s.files ? "image" : "sample";
   $("#srcKind").textContent = label;
-  $("#srcName").textContent = s ? s.name : "No source loaded";
+  $("#srcName").textContent = s ? s.name : "Drop an image, GIF, video, SVG or Lottie file";
+  $("#srcName").classList.toggle("has", !!s);
   $("#frameOpts").open = !!s && (s.kind === "frames" || s.kind === "lottie");
 }
 async function resample() {
@@ -4764,11 +4903,12 @@ async function rebuildLottie(anim) {
         if (blob) { a.p = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); }); a.u = ""; a.e = 1; }
       }
     }
-    const raw = dedupeFrames(await renderLottieFrames(src, st), st);
+    const rendered = await renderLottieFrames(src, st);
+    const raw = dedupeFrames(rendered, st);
     const name = S.src.name;
-    S.src = { kind: raw.length > 1 ? "frames" : "image", name, files: S.src.files, raw, rebuilt: anim, images: S.src.images };
+    S.src = { kind: raw.length > 1 ? "frames" : "image", name, files: S.src.files, raw, rebuilt: anim, images: S.src.images, rate: rendered.rate };
+    matchSourceRate(S.src);
     S.edits = { merge: [], del: [] }; S.selColor = -1; S.lastBytes = null;
-    $("#motionMode").value = "smart";
     updateSrcInfo();
     await reprocess();
   } catch (e) { console.error(e); setStatus($("#srcStatus"), "Couldn't render that animation: " + e.message, "err"); }
@@ -4797,21 +4937,27 @@ bindRange("maxf", v => v, resample);
 $("#trimA").addEventListener("change", resample);
 $("#trimB").addEventListener("change", resample);
 $("#dedupe").addEventListener("change", resample);
+function updateAllFramesUI() { const on = $("#allFrames").checked; $("#sfps").disabled = on; $("#maxf").disabled = on; $("#allFramesNote").hidden = !on; }
+$("#allFrames").addEventListener("change", () => { updateAllFramesUI(); LS.set("allFrames", $("#allFrames").checked ? "1" : "0"); resample(); });
 $("#rmbg").addEventListener("change", scheduleReprocess);
 $("#aaclean").addEventListener("change", traceChange);
+function updateEngineUI() { const lineart = $("#engine").value === "lineart"; $("#strokesWrap").hidden = !lineart; $("#smaxWrap").hidden = !lineart || !$("#strokes").checked; }
+$("#engine").addEventListener("change", () => { LS.set("engine", $("#engine").value); updateEngineUI(); scheduleReprocess(); });
 $("#strokes").addEventListener("change", () => { toCustom(); $("#smaxWrap").hidden = !$("#strokes").checked; scheduleReprocess(); });
 function updateSizeUI() { $("#customSize").hidden = $("#csize").value !== "custom"; }
 $("#csize").addEventListener("change", () => { toCustom(); updateSizeUI(); LS.set("csize", $("#csize").value); scheduleReprocess(); });
 ["#cw", "#ch"].forEach(id => $(id).addEventListener("change", () => { LS.set(id.slice(1), $(id).value); scheduleReprocess(); }));
-document.querySelectorAll("[data-res]").forEach(b => b.addEventListener("click", () => {
-  const [w, h] = b.dataset.res.split("x"); $("#cw").value = w; $("#ch").value = h; LS.set("cw", w); LS.set("ch", h); scheduleReprocess();
-}));
+$("#resPreset").addEventListener("change", e => {
+  if (!e.target.value) return;
+  const [w, h] = e.target.value.split("x"); $("#cw").value = w; $("#ch").value = h; LS.set("cw", w); LS.set("ch", h);
+  e.target.value = ""; scheduleReprocess();
+});
 $("#prec").addEventListener("change", () => { toCustom(); S.base && S.base.mode === "lottie" ? scheduleCompile() : scheduleReprocess(); });
 $("#fps").addEventListener("change", () => { toCustom(); scheduleCompile(); });
 $("#strip").addEventListener("change", () => { toCustom(); scheduleCompile(); });
 $("#allPreset").addEventListener("change", scheduleCompile);
 $("#allPresetF").addEventListener("change", scheduleCompile);
-$("#motionMode").addEventListener("change", scheduleCompile);
+$("#motionMode").addEventListener("change", () => { LS.set("motionMode", $("#motionMode").value); scheduleCompile(); });
 ["#optHidden", "#optTiny", "#optRefit"].forEach(id => $(id).addEventListener("change", scheduleCompile));
 $("#profile").addEventListener("change", e => {
   const p = PROFILES[e.target.value]; if (!p) return;
@@ -4820,22 +4966,36 @@ $("#profile").addEventListener("change", e => {
   setR("cols", p.cols, v => v); setR("tol", p.tol, v => (+v).toFixed(1) + " px"); setR("omit", p.omit, v => v + " px"); setR("blur", p.blur, v => v);
   setR("sfps", p.sfps, v => v + " fps"); setR("maxf", p.maxf, v => v);
   $("#prec").value = p.prec; $("#strip").checked = p.strip; if ($("#csize").value !== "custom") $("#csize").value = p.csize; $("#fps").value = p.fps;
-  $("#strokes").checked = p.strokes; $("#aaclean").checked = p.aa; $("#smaxWrap").hidden = !p.strokes;
+  $("#strokes").checked = p.strokes; $("#aaclean").checked = p.aa; updateEngineUI();
   S.edits = { merge: [], del: [] };
   if (S.src && (S.src.kind === "frames") && S.src.files && !S.src.rebuilt) openFiles(S.src.files); else scheduleReprocess();
 });
 const drop = $("#drop");
-["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
-["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
-drop.addEventListener("drop", e => { if (e.dataTransfer.files.length) openFiles(e.dataTransfer.files); });
+let dragDepth = 0;
+document.addEventListener("dragenter", e => { if (e.dataTransfer && [...e.dataTransfer.types].includes("Files")) { e.preventDefault(); dragDepth++; drop.classList.add("over"); } });
+document.addEventListener("dragover", e => { if (e.dataTransfer && [...e.dataTransfer.types].includes("Files")) e.preventDefault(); });
+document.addEventListener("dragleave", () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) drop.classList.remove("over"); });
+document.addEventListener("drop", e => {
+  dragDepth = 0; drop.classList.remove("over");
+  if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+  e.preventDefault();
+  if (e.target.closest && e.target.closest('label[for="batchIn"]')) return;
+  openFiles(e.dataTransfer.files);
+});
+// left-hand step tabs
+document.querySelectorAll(".steptabs [data-step]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".steptabs [data-step]").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+  ["s1", "s2", "s3", "s4"].forEach(id => { $("#" + id).hidden = id !== b.dataset.step; });
+  try { localStorage.setItem("lf.step", b.dataset.step); } catch (e) {}
+}));
 $("#fileIn").addEventListener("change", e => { if (e.target.files.length) openFiles(e.target.files); e.target.value = ""; });
 document.addEventListener("paste", e => {
   if (/^(TEXTAREA|INPUT)$/.test(document.activeElement && document.activeElement.tagName)) return;
   const files = [...(e.clipboardData && e.clipboardData.files || [])];
   if (files.length) openFiles(files);
 });
-document.querySelectorAll(".tabs [role=tab]").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll(".tabs [role=tab]").forEach(x => x.setAttribute("aria-selected", x === b));
+document.querySelectorAll(".stagebar [role=tab]").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".stagebar [role=tab]").forEach(x => x.setAttribute("aria-selected", x === b));
   ["lottie", "source", "parts"].forEach(t => { $("#v-" + t).hidden = t !== b.dataset.tab; });
 }));
 document.querySelectorAll(".bgsw button").forEach(b => b.addEventListener("click", () => {
@@ -4846,11 +5006,18 @@ $("#playBtn").addEventListener("click", () => {
   if (!S.anim) return;
   S.playing = !S.playing;
   if (S.playing) S.anim.play(); else S.anim.pause();
-  $("#playBtn").textContent = S.playing ? "Pause" : "Play";
+  setPlayIcon();
 });
+function setPlayIcon() {
+  const b = $("#playBtn");
+  b.innerHTML = S.playing
+    ? '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg>'
+    : '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z" fill="currentColor"/></svg>';
+  b.setAttribute("aria-label", S.playing ? "Pause" : "Play");
+}
 $("#scrub").addEventListener("input", e => {
   if (!S.anim) return;
-  S.playing = false; $("#playBtn").textContent = "Play";
+  S.playing = false; setPlayIcon();
   S.anim.goToAndStop(+e.target.value, true);
 });
 
@@ -4892,10 +5059,14 @@ $("#loadSample").addEventListener("click", async () => {
     $("#lottieBox").innerHTML = `<div class="empty"><strong>Player failed to start</strong>The built-in libraries could not run in this browser. Try a current Chrome, Edge, Firefox or Safari.</div>`;
     return;
   }
-  const z = LS.get("zoom", "1"); if ([...$("#zoom").options].some(o => o.value === z)) $("#zoom").value = z;
+  const step = LS.get("step", "s1"); const sb = document.querySelector(`.steptabs [data-step="${step}"]`); if (sb) sb.click();
+  const z = LS.get("zoom", "auto"); if ([...$("#zoom").options].some(o => o.value === z)) $("#zoom").value = z;
   const cs = LS.get("csize", ""); if ([...$("#csize").options].some(o => o.value === cs)) $("#csize").value = cs;
   $("#cw").value = LS.get("cw", "320"); $("#ch").value = LS.get("ch", "240");
   updateSizeUI();
+  $("#allFrames").checked = LS.get("allFrames", "0") === "1"; updateAllFramesUI();
+  const eng = LS.get("engine", "classic"); if (eng === "classic" || eng === "lineart") $("#engine").value = eng; updateEngineUI();
+  const mm = LS.get("motionMode", ""); if (mm === "smart" || mm === "flip") $("#motionMode").value = mm;
   showEmpty(); updateMotionUI();
 })();
 
