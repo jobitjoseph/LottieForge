@@ -5,142 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lottie Forge</title>
 <meta name="author" content="Jobit Joseph">
-<!-- Lottie Forge © 2026 Jobit Joseph. All rights reserved. -->
+<!-- Lottie Forge. Copyright (c) 2026 Jobit Joseph. MIT License: https://opensource.org/licenses/MIT -->
 <style>
-/* Layout: one-screen workbench — top bar, tabbed controls on the left, preview stage on the right; fits 1280×720 and up without page scrolling */
+/* Layout: one control column on the left (file card, then every setting visible as compact icon rows); preview on the right.
+   Fits 1280×720 and up without scrolling. Phones: one stacked column with text labels beside the icons. */
 :root {
   --bg: #eef2f3; --panel: #ffffff; --sunk: #f5f8f9; --ink: #13212a; --muted: #586a75; --line: #d6dee2;
   --accent: #0a7570; --accent-ink: #ffffff; --accent-soft: #d9efed; --key: #b45309; --ok: #15803d; --err: #b42318;
-  --check-a: #ffffff; --check-b: #e3e9ec;
+  --check-a: #ffffff; --check-b: #e3e9ec; --tip-bg: #13212a; --tip-fg: #ffffff;
   --font-display: "Segoe UI Variable Display", "SF Pro Display", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --r: 8px; color-scheme: light;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0c1317; --panel: #131c22; --sunk: #0f171c; --ink: #e2eaee; --muted: #93a5af; --line: #24323a;
     --accent: #3cc2b9; --accent-ink: #04201e; --accent-soft: #123532; --key: #f2a33a; --ok: #4ade80; --err: #f87171;
-    --check-a: #1a252c; --check-b: #141d23; color-scheme: dark;
+    --check-a: #1a252c; --check-b: #141d23; --tip-bg: #e2eaee; --tip-fg: #0c1317; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0c1317; --panel: #131c22; --sunk: #0f171c; --ink: #e2eaee; --muted: #93a5af; --line: #24323a;
   --accent: #3cc2b9; --accent-ink: #04201e; --accent-soft: #123532; --key: #f2a33a; --ok: #4ade80; --err: #f87171;
-  --check-a: #1a252c; --check-b: #141d23; color-scheme: dark;
+  --check-a: #1a252c; --check-b: #141d23; --tip-bg: #e2eaee; --tip-fg: #0c1317; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
-  background: var(--bg); color: var(--ink); font: 13px/1.45 var(--font-body);
+  background: var(--bg); color: var(--ink); font: 12.5px/1.35 var(--font-body);
   padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
   padding-block: 8px;
-  display: flex; flex-direction: column; gap: 8px; min-height: 100vh;
 }
-/* top bar */
-.topbar { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; max-width: 1920px; width: 100%; margin: 0 auto; }
-.topbar h1 { font: 700 20px/1 var(--font-display); margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
-.topbar h1 span { color: var(--accent); }
-.srcbar { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; padding: 4px 4px 4px 10px; border: 1.5px dashed var(--line); border-radius: var(--r); background: var(--panel); }
-.srcbar.over { border-color: var(--accent); background: var(--accent-soft); }
-.srcbar #srcName { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
-.srcbar #srcName.has { color: var(--ink); }
-/* main grid */
-.app { flex: 1; min-height: 0; max-width: 1920px; width: 100%; margin: 0 auto; display: grid; grid-template-columns: minmax(330px, 380px) minmax(0, 1fr); gap: 10px; }
-@media (min-width: 1600px) { .app { grid-template-columns: 420px minmax(0, 1fr); } }
-.controls { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
-.steptabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
-.steptabs button { border: 0; border-radius: 0; background: transparent; padding: 8px 4px 7px; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 12px; color: var(--muted); border-bottom: 2px solid transparent; }
-.steptabs button b { font: 500 10px var(--font-mono); color: var(--accent); }
-.steptabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); background: var(--sunk); }
-.steptabs button:hover { color: var(--ink); }
-.pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
-.pane h2 { margin: 0; font: 600 14px/1.2 var(--font-display); display: flex; align-items: center; gap: 8px; }
-.pane h2 .aside { margin-left: auto; font: 400 11px var(--font-mono); color: var(--muted); }
-.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; }
-.checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 10px; }
-label.f { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; color: var(--muted); min-width: 0; }
-label.f > span { display: flex; justify-content: space-between; gap: 6px; }
-label.f output { font-family: var(--font-mono); color: var(--ink); }
-label.chk { display: flex; gap: 7px; align-items: center; font-size: 12.5px; min-width: 0; }
-input[type=text], input[type=number], select, textarea {
-  font: inherit; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; width: 100%; min-width: 0;
-}
-input[type=range] { width: 100%; accent-color: var(--accent); margin: 2px 0; }
-input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; flex: none; margin: 0; }
+.app { display: grid; gap: 10px; max-width: 1400px; margin: 0 auto;
+  grid-template-columns: minmax(370px, 440px) minmax(0, 1fr);
+  grid-template-areas: "src stage" "ctl stage" "ctl foot"; grid-template-rows: auto minmax(0, 1fr) auto; }
+.src { grid-area: src; } .ctl { grid-area: ctl; } .stage { grid-area: stage; } .foot { grid-area: foot; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+/* file card */
+.src { padding: 8px 11px; display: flex; flex-direction: column; gap: 6px; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand h1 { font: 700 18px/1 var(--font-display); margin: 0; letter-spacing: -0.01em; }
+.brand h1 span { color: var(--accent); }
+.drop { border: 1.5px dashed #9fb4bc; border-radius: 6px; background: var(--sunk); min-height: 34px; display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; }
+.drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+#srcName { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+#srcName:not(.has) { font-weight: 400; color: var(--muted); }
+.drop small { color: var(--muted); white-space: nowrap; }
+/* control column */
+.ctl { display: flex; flex-direction: column; padding: 4px 11px 8px; min-height: 0; overflow: auto; }
+.grp { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 5px; border-top: 1px solid var(--line); }
+.grp:first-child { border-top: 0; }
+.hd { display: flex; align-items: center; gap: 6px; font: 600 10.5px var(--font-body); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); min-height: 16px; }
+.hd .aside { margin-left: auto; text-transform: none; letter-spacing: 0; font: 400 10.5px var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.r { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.r2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.sp { flex: 1; }
+/* icon + slider + value */
+.sl { display: grid; grid-template-columns: 18px minmax(0, 1fr) 44px; align-items: center; gap: 5px; min-width: 0; }
+.sl output { font: 11px var(--font-mono); text-align: right; white-space: nowrap; }
+.sl.tight { grid-template-columns: 16px minmax(0, 1fr) 38px; min-width: 90px; }
+.sl .lbl { display: none; }
+.ic { width: 16px; height: 16px; color: var(--muted); display: block; flex: none; }
+input[type=range] { width: 100%; accent-color: var(--accent); margin: 0; height: 16px; min-width: 0; }
+input:disabled, select:disabled, button:disabled, .tg:has(input:disabled), .disabled { opacity: .45; cursor: default; }
+select, input[type=number], input[type=text] { font: inherit; color: var(--ink); background: var(--sunk); border: 1px solid var(--line); border-radius: 5px; padding: 2px 6px; min-width: 0; height: 26px; }
+select { flex: 1; width: 100%; }
+.num { display: flex; align-items: center; gap: 3px; }
+.num input { width: 56px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-button { font: 500 12.5px var(--font-body); border-radius: 6px; padding: 6px 10px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); white-space: nowrap; }
-button:hover { border-color: var(--accent); }
-button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-button.primary:hover { filter: brightness(1.08); }
-button.ghost { background: transparent; border-color: transparent; color: var(--muted); padding-inline: 6px; }
-button.ghost:hover { color: var(--ink); }
-button.icon { width: 30px; height: 30px; padding: 0; display: inline-grid; place-items: center; }
-button.icon svg { width: 16px; height: 16px; }
-button:disabled { opacity: .5; cursor: default; }
-/* hover tooltips */
-[data-tip] { position: relative; }
-[data-tip]:hover::after, [data-tip]:focus-visible::after {
-  content: attr(data-tip); position: absolute; z-index: 60; left: 50%; top: calc(100% + 6px); transform: translateX(-50%);
-  background: var(--ink); color: var(--bg); font: 500 11.5px/1.35 var(--font-body); padding: 5px 8px; border-radius: 5px;
-  white-space: normal; width: max-content; max-width: 240px; text-align: left; pointer-events: none; box-shadow: 0 4px 14px rgb(0 0 0 / .18);
-}
-[data-tip].tip-up:hover::after, [data-tip].tip-up:focus-visible::after { top: auto; bottom: calc(100% + 6px); }
-[data-tip].tip-left:hover::after { left: auto; right: 0; transform: none; }
-[data-tip].tip-right:hover::after { left: 0; transform: none; }
-label.primary { display: inline-flex; align-items: center; font: 500 12.5px var(--font-body); border-radius: 6px; padding: 6px 12px; background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); white-space: nowrap; }
-label.primary:hover { filter: brightness(1.08); }
-.chip { font: 500 10.5px/1 var(--font-mono); padding: 4px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-.hint { font-size: 11.5px; color: var(--muted); margin: 0; }
-.status { font-size: 12px; color: var(--muted); }
-.status:empty { display: none; }
-.status.err { color: var(--err); }
-.status.ok { color: var(--ok); }
-.drop { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 12px; text-align: center; background: var(--sunk); cursor: pointer; display: flex; flex-direction: column; gap: 2px; align-items: center; }
-.drop:hover { border-color: var(--accent); }
-.drop small { color: var(--muted); }
-details { border-top: 1px solid var(--line); padding-top: 8px; }
-details > summary { cursor: pointer; font-size: 12.5px; font-weight: 500; list-style: none; display: flex; align-items: center; gap: 6px; }
-details > summary::-webkit-details-marker { display: none; }
-details > summary::before { content: "▸"; color: var(--muted); font-size: 10px; transition: transform .15s; }
-details[open] > summary::before { transform: rotate(90deg); }
-details > .inner { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
-.swatches { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
-.swatch { width: 24px; height: 24px; border-radius: 5px; border: 1px solid var(--line); padding: 0; position: relative; }
-.swatch[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 2px; }
+button, .btn { font: 500 12px var(--font-body); border-radius: 5px; height: 26px; padding: 0 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; flex: none; }
+button:hover, .btn:hover { border-color: var(--accent); }
+.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pri:hover { filter: brightness(1.08); }
+.ghost { border-color: transparent; background: transparent; color: var(--muted); padding: 0 4px; }
+.ghost:hover { color: var(--ink); }
+.ib { width: 28px; padding: 0; justify-content: center; }
+button svg, .btn svg { width: 15px; height: 15px; flex: none; }
+/* checkbox toggles drawn as buttons */
+.tg { font: 500 12px var(--font-body); border-radius: 5px; height: 26px; padding: 0 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; white-space: nowrap; user-select: none; flex: none; }
+.tg.only { width: 28px; padding: 0; justify-content: center; }
+.tg svg { width: 15px; height: 15px; }
+.tg input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.tg:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.tg:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tg:hover { border-color: var(--accent); }
+.tg .lbl, .tg .txt { white-space: nowrap; }
+.tg.only .lbl { display: none; }
+/* segmented choice (drives a hidden select) */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex: none; }
+.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); height: 24px; padding: 0 8px; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg.dis { opacity: .45; pointer-events: none; }
+/* colours */
+.swatches { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-width: 0; }
+.swatch { width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--line); padding: 0; position: relative; flex: none; }
+.swatch[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
 .swatch.bg { box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--muted); }
 .swatch.del { opacity: .35; }
-.swatch.del::before { content: ""; position: absolute; left: 3px; right: 3px; top: 50%; border-top: 2px solid var(--err); transform: rotate(-35deg); }
-.swatchbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); }
-.panel { border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: flex; flex-direction: column; gap: 8px; background: var(--sunk); }
-.panel h3 { margin: 0; font: 600 12.5px var(--font-body); display: flex; align-items: center; gap: 8px; }
-.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: 11.5px; margin: 0; }
-.kv dt { color: var(--muted); }
-.kv dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.good { color: var(--ok); } .warn { color: var(--key); } .bad { color: var(--err); }
-.warnlist { margin: 0; padding-left: 16px; font-size: 11.5px; color: var(--key); }
+.swatch.del::before { content: ""; position: absolute; left: 2px; right: 2px; top: 50%; border-top: 2px solid var(--err); transform: rotate(-35deg); }
+.mini { font: 11px var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.mcu { display: flex; flex-wrap: wrap; gap: 2px 10px; font: 11px var(--font-mono); color: var(--muted); }
+.mcu b { color: var(--ink); font-weight: 500; }
+.good { color: var(--ok) !important; } .warn { color: var(--key) !important; } .bad { color: var(--err) !important; }
+.warnlist { margin: 0; padding-left: 15px; font-size: 11px; color: var(--key); }
 .warnlist:empty { display: none; }
-.progress { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; flex: none; }
+.status { font-size: 11.5px; color: var(--muted); }
+.status:empty { display: none; }
+.status.err { color: var(--err); } .status.ok { color: var(--ok); }
+.hint { margin: 0; font-size: 11px; color: var(--muted); }
+.hint:empty { display: none; }
+.chip { font: 500 10px/1 var(--font-mono); padding: 3px 6px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+#resLabel:empty { display: none; }
+.progress { height: 2px; background: transparent; border-radius: 2px; overflow: hidden; flex: none; margin-top: -3px; }
 .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .15s; }
-.partsel .tag { font: 500 12px var(--font-mono); color: var(--accent); }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); padding: 5px 9px; }
-.seg button:last-child { border-right: 0; }
-/* stage */
-.stage { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+/* floating tooltip: positioned by script, always kept inside the window */
+#tip { position: fixed; z-index: 1000; left: 0; top: 0; max-width: min(280px, calc(100vw - 16px)); background: var(--tip-bg); color: var(--tip-fg); font: 500 11.5px/1.4 var(--font-body); padding: 6px 9px; border-radius: 6px; box-shadow: 0 6px 18px rgb(0 0 0 / .22); pointer-events: none; opacity: 0; transition: opacity .08s; }
+#tip.on { opacity: 1; }
+/* preview */
+.stage { display: flex; flex-direction: column; gap: 8px; min-height: 0; min-width: 0; }
 .stagebar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.stagebar [role=tab][aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.stagebar .sp { flex: 1; }
-.bgsw { display: flex; gap: 4px; align-items: center; }
+.vseg button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.bgsw { display: flex; gap: 4px; align-items: center; margin-left: auto; }
 .bgsw button { width: 22px; height: 22px; padding: 0; border-radius: 50%; }
 .bgsw button[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
-.view { flex: 1; min-height: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+#zoom { width: auto; flex: none; }
+.view { flex: 1; min-height: 0; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
 .scrollbox { flex: 1; min-height: 0; overflow: auto; display: flex; border-radius: 6px; min-width: 0; }
 .scrollbox > .canvasbox { margin: auto; flex: none; }
 .canvasbox { position: relative; border-radius: 4px; overflow: hidden; display: grid; place-items: center; }
-.canvasbox.checker { background-color: var(--check-a); background-image: linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%), linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%); background-size: 16px 16px; background-position: 0 0, 8px 8px; }
+.canvasbox.checker { background-color: var(--check-a); background-image: linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%), linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%); background-size: 14px 14px; background-position: 0 0, 7px 7px; }
 .canvasbox.light { background: #ffffff; }
 .canvasbox.dark { background: #0b0f12; }
 .fitbox { flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; }
@@ -152,109 +148,155 @@ details > .inner { display: flex; flex-direction: column; gap: 8px; padding-top:
 .empty strong { display: block; color: var(--ink); font: 600 15px var(--font-display); margin-bottom: 4px; }
 .transport { display: flex; gap: 8px; align-items: center; flex: none; }
 .transport input[type=range] { flex: 1; }
-.transport .tc { font: 11.5px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 8ch; text-align: right; }
+.transport .tc { font: 11px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 8ch; text-align: right; }
 .filmstrip { display: flex; gap: 5px; overflow-x: auto; flex: none; }
-.filmstrip canvas { height: 44px; border: 1px solid var(--line); border-radius: 4px; flex: none; background: var(--check-a); }
-.stats { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; margin: 0; flex: none; }
-.stats div { background: var(--panel); padding: 5px 9px; min-width: 0; }
-.stats dt { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
-.stats dd { margin: 0; font: 500 14px var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.filmstrip canvas { height: 40px; border: 1px solid var(--line); border-radius: 4px; flex: none; background: var(--check-a); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 0; flex: none; }
+.stats div { background: var(--panel); padding: 4px 9px; min-width: 0; }
+.stats dt { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.stats dd { margin: 0; font: 500 13.5px var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .stats dd small { font-size: 10px; margin-left: 3px; }
-.infoline { display: flex; gap: 6px; align-items: center; min-width: 0; flex: none; min-height: 22px; }
-.features { font: 11px var(--font-mono); color: var(--muted); display: flex; flex-wrap: nowrap; gap: 5px; overflow: hidden; min-width: 0; flex: 1; }
-.features span { border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; color: var(--ink); white-space: nowrap; }
+.features { font: 10.5px var(--font-mono); color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px; flex: none; }
+.features span { border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; color: var(--ink); white-space: nowrap; }
 .features span b { color: var(--accent); font-weight: 500; }
-.notes { font-size: 11.5px; color: var(--key); margin: 0; padding: 0; list-style: none; display: flex; gap: 10px; flex-wrap: wrap; flex: none; }
+.notes { font-size: 11px; color: var(--key); margin: 0; padding: 0; list-style: none; display: flex; gap: 2px 10px; flex-wrap: wrap; flex: none; }
 .notes:empty { display: none; }
 .notes li::before { content: "• "; }
-.foot { max-width: 1920px; width: 100%; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 16px; font-size: 11px; color: var(--muted); }
-/* one-screen mode on desktop-sized windows; on small screens the page scrolls normally */
+.foot { font-size: 10.5px; color: var(--muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1px 12px; align-self: end; }
+/* one screen on desktop-sized windows */
 @media (min-width: 900px) and (min-height: 560px) {
   body { height: 100vh; overflow: hidden; }
+  .app { height: 100%; }
 }
+/* phones and small windows: one stacked column, page scrolls, text beside icons */
 @media (max-width: 899px), (max-height: 559px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
-  .stage { order: -1; }
-  .view { min-height: 60vh; }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-areas: "src" "stage" "ctl" "foot"; grid-template-rows: none; }
+  .ctl { overflow: visible; }
+  .view { min-height: 0; }
+  .scrollbox { flex: none; height: min(58vh, 420px); }
+  .r { flex-wrap: wrap; }
+  .r select { flex: 1 1 140px; }
+  .r2 { grid-template-columns: minmax(0, 1fr); }
+  .sl, .sl.tight { grid-template-columns: 18px 92px minmax(0, 1fr) 44px; }
+  #strokesWrap { flex-wrap: wrap; flex: 1 1 100% !important; }
+  #smaxWrap, .sl.tight { flex: 1 1 100% !important; }
+  .sl .lbl { display: block; color: var(--muted); font-size: 12px; }
+  .tg.only { width: auto; padding: 0 8px; }
+  .tg.only .lbl { display: inline; }
   .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .controls { overflow: visible; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<header class="topbar">
-  <h1>Lottie <span>Forge</span></h1>
-  <div id="drop" data-tip="Drop a file anywhere on the page, or click Open. Images, GIF, video, SVG or Lottie (.json / .lottie). Several images become a frame sequence." class="srcbar tip-right">
-    <span class="chip" id="srcKind">empty</span>
-    <span id="srcName">Drop an image, GIF, video, SVG or Lottie file</span>
-    <button class="ghost" id="loadSample" type="button" data-tip="Load a small built-in drawing to try the tool">Sample</button>
-    <label class="primary" for="fileIn" style="cursor:pointer"><span class="btnlike">Open file</span></label>
-    <input id="fileIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden>
-  </div>
-</header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-fps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></symbol>
+    <symbol id="i-frames" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+    <symbol id="i-start" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4v16M19 6l-8 6 8 6z"/></symbol>
+    <symbol id="i-end" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 4v16M5 6l8 6-8 6z"/></symbol>
+    <symbol id="i-merge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-every" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-colours" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></symbol>
+    <symbol id="i-tol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c4 0 4-10 9-10s5 10 9 10"/><circle cx="3" cy="17" r="1.5"/><circle cx="21" cy="17" r="1.5"/></symbol>
+    <symbol id="i-speck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="8" r="1.5"/><circle cx="16" cy="6" r="1"/><circle cx="12" cy="15" r="2"/><path d="M4 20 20 4"/></symbol>
+    <symbol id="i-blur" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+    <symbol id="i-bg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="4" fill="currentColor"/></symbol>
+    <symbol id="i-edges" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 20 4"/><path d="M15 4h5v5M4 15v5h5"/></symbol>
+    <symbol id="i-stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="i-width" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4 6h16" stroke-width="1.5"/><path d="M4 12h16" stroke-width="3"/><path d="M4 18h16" stroke-width="5"/></symbol>
+    <symbol id="i-curve" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18C6 6 18 6 21 18"/></symbol>
+    <symbol id="i-lineart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 9 7l6 8 6-10"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="13" height="15" rx="1.5"/><path d="M4 7v12.5A1.5 1.5 0 0 0 5.5 21H16"/></symbol>
+    <symbol id="i-smart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="12" r="4"/><path d="M3 9h6M2 12h7M3 15h6"/></symbol>
+    <symbol id="i-loop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+    <symbol id="i-all" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 15 3-3 2 2 3-4"/></symbol>
+    <symbol id="i-part" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l7 17 2.5-7.5L21 11z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><path d="m4 20 16-16"/></symbol>
+    <symbol id="i-eyeoff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7c2 0 3.8.7 5.2 1.6M22 12s-3.5 7-10 7c-2 0-3.8-.7-5.2-1.6M3 3l18 18"/></symbol>
+    <symbol id="i-refit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17C7 5 17 5 21 17"/><circle cx="3" cy="17" r="1.5"/><circle cx="12" cy="8" r="1.5"/><circle cx="21" cy="17" r="1.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1.5"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+    <symbol id="i-batch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v12M18 7h-7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></symbol>
+    <symbol id="i-del" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></symbol>
+    <symbol id="i-join" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="i-size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M17 9v6M9 12h6"/></symbol>
+    <symbol id="i-profile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+    <symbol id="i-play" viewBox="0 0 16 16"><path d="M4 2.5v11l9.5-5.5z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 16 16"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></symbol>
+  </defs>
+</svg>
 
 <main class="app">
-  <section class="controls" aria-label="Settings">
-    <div class="steptabs" role="tablist">
-      <button type="button" role="tab" aria-selected="true" data-step="s1" data-tip="Frame sampling and trimming for GIF, video and Lottie sources"><b>01</b>Source</button>
-      <button type="button" role="tab" aria-selected="false" data-step="s2" data-tip="How the picture is turned into vector shapes: size, colours, smoothness, strokes"><b>02</b>Vectorise</button>
-      <button type="button" role="tab" aria-selected="false" data-step="s3" data-tip="Add motion presets, or choose how frame sequences become animation"><b>03</b>Motion</button>
-      <button type="button" role="tab" aria-selected="false" data-step="s4" data-tip="Optimise and download .json, .lottie, or a LottieMCU header" class="tip-left"><b>04</b>Export</button>
+  <!-- FILE -->
+  <section class="card src" aria-label="File">
+    <div class="brand">
+      <h1>Lottie <span>Forge</span></h1>
+      <span class="sp"></span>
+      <button class="ghost" id="loadSample" type="button" data-tip="Load a small built-in drawing to try the tool">Sample</button>
+    </div>
+    <label class="drop" id="drop" for="fileIn" data-tip="Drop a file here or anywhere on the page, or click to choose one. Images (PNG, JPG, WebP), GIF, video (MP4, WebM), SVG, or Lottie (.json / .lottie). Several images become a frame sequence.">
+      <svg class="ic"><use href="#i-open"/></svg>
+      <span class="chip" id="srcKind">empty</span>
+      <span id="srcName">Drop a file or click to open</span>
+      <small>drop or click</small>
+      <input id="fileIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden>
+    </label>
+    <div class="status" id="srcStatus" role="status"></div>
+  </section>
+
+  <!-- SETTINGS: everything visible -->
+  <section class="card ctl" aria-label="Settings">
+    <!-- frames -->
+    <div class="grp">
+      <div class="hd">Frames <span class="aside">GIF · video · Lottie rebuild</span></div>
+      <div class="r2">
+        <label class="sl" data-tip="Sample rate: frames per second taken from a GIF or video. Fewer frames give smaller files."><svg class="ic"><use href="#i-fps"/></svg><span class="lbl">Sample rate</span><input id="sfps" type="range" min="2" max="30" value="10"><output id="sfpsO">10 fps</output></label>
+        <label class="sl" data-tip="Max frames: upper limit on the number of frames taken"><svg class="ic"><use href="#i-frames"/></svg><span class="lbl">Max frames</span><input id="maxf" type="range" min="2" max="120" value="24"><output id="maxfO">24</output></label>
+      </div>
+      <div class="r">
+        <label class="num" data-tip="Start time in seconds: skip everything before it"><svg class="ic"><use href="#i-start"/></svg><input id="trimA" type="number" min="0" step="0.1" value="0" aria-label="Start time in seconds"></label>
+        <label class="num" data-tip="End time in seconds. 0 plays to the end."><svg class="ic"><use href="#i-end"/></svg><input id="trimB" type="number" min="0" step="0.1" value="0" aria-label="End time in seconds"></label>
+        <span class="sp"></span>
+        <label class="tg" data-tip="Frames that look the same as the one before are merged into a longer hold"><input type="checkbox" id="dedupe" checked><svg><use href="#i-merge"/></svg><span class="txt">Merge</span></label>
+        <label class="tg" data-tip="Take every frame of the GIF or video at its own frame rate, instead of sampling (up to 600 frames)"><input type="checkbox" id="allFrames"><svg><use href="#i-every"/></svg><span class="txt">Every frame</span></label>
+      </div>
+      <p class="hint" id="allFramesNote" hidden>Every frame is on: sample rate and max frames are ignored, and the source's own frame rate is used.</p>
     </div>
 
-    <!-- 1 SOURCE -->
-    <div class="pane" id="s1">
-      <h2>Source</h2>
-      <label class="drop" for="fileIn"><strong>Drop or choose a file</strong><small>PNG, JPG, WebP, GIF, MP4, WebM, SVG, Lottie .json or .lottie</small></label>
-      <div class="status" id="srcStatus" role="status"></div>
-      <h2 style="margin-top:4px">Frame sampling <span class="aside">GIF, video, Lottie rebuild</span></h2>
-      <div class="grid2">
-        <label class="f" data-tip="How many frames per second to take from a GIF or video. Fewer frames give smaller files."><span>Sample rate <output id="sfpsO">10 fps</output></span><input id="sfps" type="range" min="2" max="30" value="10"></label>
-        <label class="f" data-tip="Upper limit on the number of frames taken"><span>Max frames <output id="maxfO">24</output></span><input id="maxf" type="range" min="2" max="120" value="24"></label>
-        <label class="f" data-tip="Skip everything before this time"><span>Start (s)</span><input id="trimA" type="number" min="0" step="0.1" value="0"></label>
-        <label class="f" data-tip="Stop at this time. 0 means play to the end."><span>End (s, 0 = end)</span><input id="trimB" type="number" min="0" step="0.1" value="0"></label>
-      </div>
-      <div class="checks">
-        <label class="chk" data-tip="Frames that look the same as the one before are merged into a longer hold"><input type="checkbox" id="dedupe" checked>Merge similar frames</label>
-        <label class="chk tip-left" data-tip="Take every frame of the GIF or video at its own frame rate, instead of sampling"><input type="checkbox" id="allFrames">Every frame</label>
-      </div>
-      <p class="hint" id="allFramesNote" hidden>Sample rate and max frames are ignored; playback uses the source's own frame rate (up to 600 frames).</p>
-      <details id="frameOpts" hidden><summary>more</summary></details>
-    </div>
-
-    <!-- 2 VECTORISE -->
-    <div class="pane" id="s2" hidden>
-      <h2>Vectorise <span class="aside" id="traceTime"></span></h2>
-      <div class="grid2">
-        <label class="f" data-tip="Ready-made settings. Changing any value below switches to Custom."><span>Profile</span>
-          <select id="profile">
-            <option value="balanced">Balanced (web, apps)</option>
-            <option value="mcu">LottieMCU lean</option>
-            <option value="detail">High detail</option>
-            <option value="custom">Custom</option>
-          </select>
-        </label>
-        <label data-tip="Size of the Lottie canvas. Custom fits and centres the artwork in an exact width × height, e.g. your display." class="f tip-left"><span>Output size</span>
-          <select id="csize">
-            <option value="240">Longest side 240</option><option value="320">Longest side 320</option><option value="480">Longest side 480</option>
-            <option value="512" selected>Longest side 512</option><option value="800">Longest side 800</option>
-            <option value="custom">Custom W × H</option>
-          </select>
-        </label>
-      </div>
-      <label class="f" data-tip="Classic: smooth ImageTracer curves, good for illustrations and photos. Line art: straight lines and sharp corners, best for icons and logos; can also turn lines into strokes."><span>Tracing engine</span>
-        <select id="engine">
-          <option value="classic" selected>Classic (smooth curves)</option>
-          <option value="lineart">Line art (straight lines, sharp corners)</option>
+    <!-- vectorise -->
+    <div class="grp">
+      <div class="hd">Vectorise <span class="aside" id="traceTime"></span></div>
+      <div class="r">
+        <svg class="ic" data-tip="Profile"><use href="#i-profile"/></svg>
+        <select id="profile" data-tip="Profile: ready-made settings. Changing any value below switches to Custom." aria-label="Profile">
+          <option value="balanced">Balanced (web, apps)</option>
+          <option value="mcu">LottieMCU lean</option>
+          <option value="detail">High detail</option>
+          <option value="custom">Custom</option>
         </select>
-      </label>
-      <div id="customSize" class="row" hidden style="flex-wrap:nowrap">
-        <input id="cw" type="number" min="16" max="4096" step="1" value="320" aria-label="Width in pixels" data-tip="Width in pixels" style="width:76px">
-        <span>×</span>
-        <input id="ch" type="number" min="16" max="4096" step="1" value="240" aria-label="Height in pixels" data-tip="Height in pixels" style="width:76px">
-        <select id="resPreset" aria-label="Common display sizes" data-tip="Common display sizes" class="tip-left" style="flex:1">
-          <option value="">Display presets…</option>
+        <div class="seg" data-seg="engine" data-tip="Tracing engine. Curves: smooth ImageTracer curves for illustrations and photos. Line art: straight lines and sharp corners for icons and logos; can also turn lines into strokes.">
+          <button type="button" data-val="classic"><svg><use href="#i-curve"/></svg>Curves</button>
+          <button type="button" data-val="lineart"><svg><use href="#i-lineart"/></svg>Line art</button>
+        </div>
+        <select id="engine" hidden aria-hidden="true" tabindex="-1"><option value="classic" selected>Classic</option><option value="lineart">Line art</option></select>
+      </div>
+      <div class="r">
+        <svg class="ic" data-tip="Output size"><use href="#i-size"/></svg>
+        <select id="csize" style="flex:1.3" data-tip="Output size of the Lottie canvas. Custom fits and centres the artwork in an exact width × height, for example your display." aria-label="Output size">
+          <option value="240">Longest side 240</option><option value="320">Longest side 320</option><option value="480">Longest side 480</option>
+          <option value="512" selected>Longest side 512</option><option value="800">Longest side 800</option>
+          <option value="custom">Custom W × H</option>
+        </select>
+        <span id="customSize" class="r" style="gap:4px;flex:none">
+          <input id="cw" type="number" min="16" max="4096" step="1" value="320" style="width:56px" aria-label="Width in pixels" data-tip="Custom width in pixels">
+          <span>×</span>
+          <input id="ch" type="number" min="16" max="4096" step="1" value="240" style="width:56px" aria-label="Height in pixels" data-tip="Custom height in pixels">
+        </span>
+        <select id="resPreset" style="flex:.7" aria-label="Common display sizes" data-tip="Common display sizes. Picking one switches to Custom W × H.">
+          <option value="">Presets</option>
           <option value="240x240">240 × 240 (1.3–1.5″ round/square)</option>
           <option value="240x320">240 × 320 (2.0–2.4″ portrait)</option>
           <option value="320x240">320 × 240 (2.0–2.8″, M5Stack)</option>
@@ -265,162 +307,153 @@ details > .inner { display: flex; flex-direction: column; gap: 8px; padding-top:
           <option value="1920x1080">1920 × 1080 (Full HD)</option>
         </select>
       </div>
-      <div class="grid2">
-        <label class="f" data-tip="Most colours kept from the image. Fewer colours give fewer shapes and smaller files."><span>Colours <output id="colsO">8</output></span><input id="cols" type="range" min="2" max="24" value="8"></label>
-        <label data-tip="How far a fitted curve may stray from the traced edge. Higher gives fewer points and smoother, simpler shapes." class="f tip-left"><span>Curve tolerance <output id="tolO">1.0 px</output></span><input id="tol" type="range" min="0.3" max="4" step="0.1" value="1"></label>
-        <label class="f" data-tip="Shapes smaller than this are dropped. Removes specks and noise."><span>Drop paths under <output id="omitO">8 px</output></span><input id="omit" type="range" min="0" max="48" value="8"></label>
-        <label data-tip="Softens the image before tracing. Helps with photos and noisy video." class="f tip-left"><span>Pre-blur <output id="blurO">0</output></span><input id="blur" type="range" min="0" max="5" value="0"></label>
+      <div class="r2">
+        <label class="sl" data-tip="Colours: most colours kept from the image. Fewer colours give fewer shapes and smaller files."><svg class="ic"><use href="#i-colours"/></svg><span class="lbl">Colours</span><input id="cols" type="range" min="2" max="24" value="8"><output id="colsO">8</output></label>
+        <label class="sl" data-tip="Curve tolerance (px): how far a fitted curve may stray from the traced edge. Higher gives fewer points and simpler shapes."><svg class="ic"><use href="#i-tol"/></svg><span class="lbl">Tolerance</span><input id="tol" type="range" min="0.3" max="4" step="0.1" value="1"><output id="tolO">1.0 px</output></label>
+        <label class="sl" data-tip="Drop paths smaller than this (px). Removes specks and noise."><svg class="ic"><use href="#i-speck"/></svg><span class="lbl">Drop under</span><input id="omit" type="range" min="0" max="48" value="8"><output id="omitO">8 px</output></label>
+        <label class="sl" data-tip="Pre-blur: softens the image before tracing. Helps with photos and noisy video."><svg class="ic"><use href="#i-blur"/></svg><span class="lbl">Pre-blur</span><input id="blur" type="range" min="0" max="5" value="0"><output id="blurO">0</output></label>
       </div>
-      <div class="checks">
-        <label class="chk" data-tip="The colour found in the corners is treated as background and left out"><input type="checkbox" id="rmbg" checked>Remove background</label>
-        <label data-tip="Soft edge pixels snap to the neighbouring colours instead of becoming thin sliver shapes" class="chk tip-left"><input type="checkbox" id="aaclean" checked>Clean edges</label>
-        <span id="strokesWrap" hidden><label data-tip="Thin lines of even thickness become single stroked paths instead of filled outlines. Best for icons and line art." class="chk tip-right"><input type="checkbox" id="strokes">Lines as strokes</label></span>
-        <label class="f tip-left" id="smaxWrap" hidden data-tip="Lines thicker than this stay filled shapes"><span>Max stroke <output id="smaxO">24 px</output></span><input id="smax" type="range" min="4" max="60" value="24"></label>
+      <div class="r">
+        <label class="tg" data-tip="Remove background: the colour found in the corners is left out"><input type="checkbox" id="rmbg" checked><svg><use href="#i-bg"/></svg><span class="txt">Remove bg</span></label>
+        <label class="tg" data-tip="Clean edges: soft edge pixels snap to neighbouring colours instead of becoming thin sliver shapes"><input type="checkbox" id="aaclean" checked><svg><use href="#i-edges"/></svg><span class="txt">Clean edges</span></label>
+        <span id="strokesWrap" class="r" style="gap:6px;flex:1;min-width:0">
+          <label class="tg" data-tip="Lines as strokes (Line art engine): thin lines of even thickness become single stroked paths instead of filled outlines"><input type="checkbox" id="strokes"><svg><use href="#i-stroke"/></svg><span class="txt">Strokes</span></label>
+          <label class="sl tight" id="smaxWrap" style="flex:1" data-tip="Thickest line treated as a stroke (px). Thicker lines stay filled shapes."><svg class="ic"><use href="#i-width"/></svg><span class="lbl">Max stroke</span><input id="smax" type="range" min="4" max="60" value="24"><output id="smaxO">24 px</output></label>
+        </span>
       </div>
-      <div class="swatchbar" id="swatchbar" hidden>
-        <span>Colours:</span>
-        <div class="swatches" id="swatches"></div>
-        <div class="row" id="swatchActions" hidden>
-        <span class="hint" id="swatchSel"></span>
-        <button type="button" id="swMerge" data-tip="Remove this colour; its pixels join the closest remaining colour">Merge</button>
-        <button type="button" id="swDelete" data-tip="Leave this colour out of the result">Delete</button>
-        <button type="button" class="ghost" id="swReset" data-tip="Undo all colour edits">Reset</button>
-        </div>
+      <div class="r" id="swatchbar">
+        <svg class="ic" data-tip="Colours found. Click a swatch to select it, then merge or delete it."><use href="#i-colours"/></svg>
+        <div class="swatches" id="swatches"><span class="mini">Colours appear after tracing</span></div>
+        <span class="mini" id="swatchSel"></span>
+        <span class="sp"></span>
+        <span id="swatchActions" class="r" style="gap:4px;flex:none">
+          <button type="button" class="ib" id="swMerge" data-tip="Merge: remove the selected colour; its pixels join the closest remaining colour"><svg><use href="#i-join"/></svg></button>
+          <button type="button" class="ib" id="swDelete" data-tip="Delete: leave the selected colour out of the result (click again to restore)"><svg><use href="#i-del"/></svg></button>
+          <button type="button" class="ib" id="swReset" data-tip="Reset all colour edits"><svg><use href="#i-reset"/></svg></button>
+        </span>
       </div>
       <div class="progress" aria-hidden="true"><i id="prog"></i></div>
     </div>
 
-    <!-- 3 MOTION -->
-    <div class="pane" id="s3" hidden>
-      <h2>Motion</h2>
-      <div id="motionImage" style="display:flex;flex-direction:column;gap:8px">
-        <div class="grid2">
-          <label class="f" data-tip="A preset motion for the whole artwork"><span>Whole artwork</span><select id="allPreset"></select></label>
-          <label data-tip="Length of one loop" class="f tip-left"><span>Loop length <output id="loopO">3.0 s</output></span><input id="loop" type="range" min="0.5" max="10" step="0.5" value="3"></label>
+    <!-- motion -->
+    <div class="grp">
+      <div class="hd">Motion</div>
+      <div class="r">
+        <div class="seg" data-seg="motionMode" data-tip="Frame sequences become: Flipbook (one vector layer per frame, exact) or Smart (shapes tracked and keyframed, smaller and smooth)">
+          <button type="button" data-val="flip"><svg><use href="#i-flip"/></svg>Flipbook</button>
+          <button type="button" data-val="smart"><svg><use href="#i-smart"/></svg>Smart</button>
         </div>
-        <label class="f partsel" data-tip="Open the Parts view and click a numbered box, then choose its motion here"><span>Part <b class="tag" id="partTag">none selected</b></span><select id="partPreset" disabled></select></label>
-        <p class="hint">Click a numbered box in the <b>Parts</b> view to animate one piece on its own.</p>
+        <select id="motionMode" hidden aria-hidden="true" tabindex="-1"><option value="flip" selected>Flipbook</option><option value="smart">Smart motion</option></select>
+        <svg class="ic" data-tip="Whole artwork"><use href="#i-all"/></svg>
+        <select id="allPreset" data-tip="Motion preset added to the whole artwork" aria-label="Whole artwork motion"></select>
       </div>
-      <div id="motionFrames" hidden style="display:flex;flex-direction:column;gap:8px">
-        <label class="f" data-tip="Flipbook: every frame is its own vector layer (exact, larger). Smart motion: shapes are tracked and keyframed (smaller, smooth)."><span>Frames become</span>
-          <select id="motionMode">
-            <option value="flip" selected>Flipbook: one vector layer per frame</option>
-            <option value="smart">Smart motion: tracked and keyframed</option>
-          </select>
-        </label>
-        <p class="hint" id="motionInfo"></p>
-        <label class="f" data-tip="A preset motion added on top of the frames"><span>Whole artwork</span><select id="allPresetF"></select></label>
+      <div class="r">
+        <svg class="ic" data-tip="Part"><use href="#i-part"/></svg>
+        <select id="partPreset" disabled data-tip="Motion for one part. Click a numbered box in the Parts view first (images and SVGs)." aria-label="Part motion"></select>
+        <span class="chip" id="partTag" data-tip="Selected part">none</span>
+        <label class="sl tight" style="flex:1.2" data-tip="Loop length for still images and SVGs"><svg class="ic"><use href="#i-loop"/></svg><span class="lbl">Loop length</span><input id="loop" type="range" min="0.5" max="10" step="0.5" value="3"><output id="loopO">3.0 s</output></label>
       </div>
-      <div id="motionLottie" hidden style="display:flex;flex-direction:column;gap:8px">
-        <p class="hint" id="lottieInfo"></p>
-        <div class="row"><button type="button" id="rebuildBtn" data-tip="Render every sampled frame and trace it again with tracked shapes. Use it for flipbook-style or image-based Lottie files.">Rebuild as smart motion</button></div>
+      <div class="r">
+        <span class="mini" id="motionInfo" style="flex:1"></span><span class="mini" id="lottieInfo" style="flex:1"></span>
+        <button type="button" id="rebuildBtn" data-tip="Lottie files: render every sampled frame and trace it again with tracked shapes. Use it for flipbook-style or image-based Lottie files.">Rebuild Lottie</button>
       </div>
     </div>
 
-    <!-- 4 EXPORT -->
-    <div class="pane" id="s4" hidden>
-      <h2>Optimise and export</h2>
-      <div class="grid2">
-        <label class="f" data-tip="Frames per second written into the Lottie"><span>Frame rate</span>
-          <select id="fps"><option>12</option><option>15</option><option selected>24</option><option>30</option><option>60</option></select>
-        </label>
-        <label data-tip="Decimal places kept on coordinates. Fewer decimals give smaller JSON." class="f tip-left"><span>Decimals</span>
-          <select id="prec"><option value="0">0 (smallest)</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option></select>
-        </label>
+    <!-- export -->
+    <div class="grp">
+      <div class="hd">Export</div>
+      <div class="r">
+        <select id="fps" style="flex:none;width:70px" data-tip="Frame rate written into the Lottie" aria-label="Frame rate"><option>12</option><option>15</option><option selected>24</option><option>30</option><option>60</option></select>
+        <span class="mini">fps</span>
+        <select id="prec" style="flex:none;width:96px" data-tip="Coordinate decimals: fewer give smaller JSON" aria-label="Decimals"><option value="0">0 decimals</option><option value="1" selected>1 decimal</option><option value="2">2 decimals</option><option value="3">3 decimals</option></select>
+        <span class="sp"></span>
+        <label class="tg only" data-tip="Strip layer and shape names. Saves space; players don't need them."><input type="checkbox" id="strip"><svg><use href="#i-tag"/></svg><span class="lbl">Strip names</span></label>
+        <span id="lottieOpts" class="r" style="gap:4px;flex:none">
+          <label class="tg only" data-tip="Lottie files: remove hidden layers and shapes"><input type="checkbox" id="optHidden" checked><svg><use href="#i-eyeoff"/></svg><span class="lbl">Hidden layers</span></label>
+          <label class="tg only" data-tip="Lottie files: remove paths smaller than the drop size"><input type="checkbox" id="optTiny" checked><svg><use href="#i-speck"/></svg><span class="lbl">Tiny paths</span></label>
+          <label class="tg only" data-tip="Lottie files: refit curves with fewer points, using the curve tolerance"><input type="checkbox" id="optRefit"><svg><use href="#i-refit"/></svg><span class="lbl">Refit curves</span></label>
+        </span>
       </div>
-      <label class="chk" data-tip="Remove layer and shape names. Saves space; players don't need them."><input type="checkbox" id="strip">Strip names</label>
-      <div id="lottieOpts" hidden class="checks">
-        <label class="chk" data-tip="Remove layers and shapes that are switched off"><input type="checkbox" id="optHidden" checked>Hidden layers</label>
-        <label data-tip="Remove paths smaller than the drop size from step 02" class="chk tip-left"><input type="checkbox" id="optTiny" checked>Tiny paths</label>
-        <label class="chk" data-tip="Refit curves with fewer points, using the curve tolerance from step 02"><input type="checkbox" id="optRefit">Refit curves</label>
+      <div class="r">
+        <button class="pri" id="dlJson" type="button" data-tip="Download Lottie JSON for web and app players">.json</button>
+        <button class="pri" id="dlLottie" type="button" data-tip="Download dotLottie: the same animation zipped, usually 3–8× smaller">.lottie</button>
+        <button class="ib" id="copyJson" type="button" data-tip="Copy the Lottie JSON to the clipboard"><svg><use href="#i-copy"/></svg></button>
+        <span class="sp"></span>
+        <svg class="ic" data-tip="LottieMCU (LMC1 1.1.0, same binary as tools/lottie2mcu.py)"><use href="#i-chip"/></svg>
+        <input id="arrName" type="text" value="anim" spellcheck="false" autocomplete="off" style="width:110px" aria-label="C array name" data-tip="C array name used in the LottieMCU header">
+        <button class="pri" id="dlH" type="button" data-tip="LottieMCU C header (PROGMEM array). #include it, then call lottie.begin(array, width, height).">.h</button>
+        <button id="dlLmc" type="button" data-tip="LottieMCU raw binary for LittleFS or SD">.lmc</button>
       </div>
-      <div class="row">
-        <button class="primary" id="dlJson" type="button" data-tip="Lottie JSON for web and app players">.json</button>
-        <button class="primary" id="dlLottie" type="button" data-tip="dotLottie: the same animation zipped, usually 3–8× smaller">.lottie</button>
-        <button id="copyJson" type="button" data-tip="Copy the Lottie JSON to the clipboard">Copy JSON</button>
+      <div class="mcu" id="mcuKv"></div>
+      <ul class="warnlist" id="mcuWarn"></ul>
+      <span id="arrEcho" hidden>anim</span>
+      <div class="r">
+        <svg class="ic" data-tip="Batch convert"><use href="#i-batch"/></svg>
+        <label class="tg" data-tip="Batch: include .json files"><input type="checkbox" id="bJson" checked><span class="txt">.json</span></label>
+        <label class="tg" data-tip="Batch: include .lottie files"><input type="checkbox" id="bLottie"><span class="txt">.lottie</span></label>
+        <label class="tg" data-tip="Batch: include LottieMCU .h headers"><input type="checkbox" id="bH" checked><span class="txt">.h</span></label>
+        <label class="tg" data-tip="Batch: include LottieMCU .lmc binaries"><input type="checkbox" id="bLmc"><span class="txt">.lmc</span></label>
+        <span class="sp"></span>
+        <label class="btn" for="batchIn" data-tip="Batch convert: choose several files; they are converted with the current settings and saved in one .zip"><svg><use href="#i-batch"/></svg>Batch…<input id="batchIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden></label>
       </div>
-      <div class="panel" id="mcuPanel">
-        <h3>LottieMCU <span class="chip" data-tip="Binary format of LottieMCU 1.1.0, identical to tools/lottie2mcu.py">LMC1 1.1.0</span></h3>
-        <div class="row" style="flex-wrap:nowrap">
-          <label class="f" style="flex:1" data-tip="Name of the C array in the header"><span>Array name</span><input id="arrName" type="text" value="anim" spellcheck="false" autocomplete="off"></label>
-          <button class="primary" id="dlH" type="button" style="align-self:end" data-tip="C header with a PROGMEM array. #include it in your sketch, then call lottie.begin(array, width, height).">.h</button>
-          <button id="dlLmc" type="button" style="align-self:end" data-tip="Raw binary for loading from LittleFS or SD" class="tip-left">.lmc</button>
-        </div>
-        <dl class="kv" id="mcuKv"></dl>
-        <ul class="warnlist" id="mcuWarn"></ul>
-        <span id="arrEcho" hidden>anim</span>
-      </div>
-      <details>
-        <summary data-tip="Convert several files with these settings into one .zip">Batch convert</summary>
-        <div class="inner">
-          <div class="row">
-            <label class="chk"><input type="checkbox" id="bJson" checked>.json</label>
-            <label class="chk"><input type="checkbox" id="bLottie">.lottie</label>
-            <label class="chk"><input type="checkbox" id="bH" checked>.h</label>
-            <label class="chk"><input type="checkbox" id="bLmc">.lmc</label>
-          </div>
-          <label class="drop" for="batchIn"><strong>Choose files to convert</strong><input id="batchIn" type="file" accept="image/*,video/*,.svg,.json,.lottie,application/json" multiple hidden></label>
-          <div class="status" id="batchStatus" role="status"></div>
-        </div>
-      </details>
+      <div class="status" id="batchStatus" role="status"></div>
       <div class="status" id="exStatus" role="status"></div>
     </div>
   </section>
 
-  <!-- STAGE -->
+  <!-- PREVIEW -->
   <section class="stage" aria-label="Preview">
-    <div class="stagebar" role="tablist">
-      <div class="seg">
+    <div class="stagebar">
+      <div class="seg vseg" role="tablist">
         <button type="button" role="tab" aria-selected="true" data-tab="lottie" data-tip="The finished vector animation">Lottie</button>
         <button type="button" role="tab" aria-selected="false" data-tab="source" data-tip="The original picture and sampled frames">Source</button>
         <button type="button" role="tab" aria-selected="false" data-tab="parts" data-tip="Numbered parts of an image or SVG. Click one to animate it.">Parts</button>
       </div>
       <span class="chip" id="resLabel" data-tip="Exact pixel size of the exported animation"></span>
-      <span class="sp"></span>
-      <select id="zoom" style="width:auto" data-tip="Preview size. Auto shows actual pixels when the animation fits, otherwise fits it to the panel." aria-label="Preview zoom">
+      <select id="zoom" data-tip="Preview size. Auto shows actual pixels when the animation fits, otherwise it fits the panel." aria-label="Preview zoom">
         <option value="auto" selected>Auto</option><option value="fit">Fit</option><option value="0.5">50%</option><option value="1">100%</option><option value="2">200%</option><option value="3">300%</option>
       </select>
       <div class="bgsw" aria-label="Preview background">
-        <button type="button" data-bg="checker" aria-pressed="true" data-tip="Transparent background" class="tip-left" style="background:repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 50%/10px 10px"></button>
-        <button type="button" data-bg="light" aria-pressed="false" data-tip="White background" class="tip-left" style="background:#fff"></button>
-        <button type="button" data-bg="dark" aria-pressed="false" data-tip="Black background" class="tip-left" style="background:#0b0f12"></button>
+        <button type="button" data-bg="checker" aria-pressed="true" data-tip="Transparent background" style="background:repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 50%/10px 10px"></button>
+        <button type="button" data-bg="light" aria-pressed="false" data-tip="White background" style="background:#fff"></button>
+        <button type="button" data-bg="dark" aria-pressed="false" data-tip="Black background" style="background:#0b0f12"></button>
       </div>
     </div>
-    <div class="view" id="v-lottie">
+    <div class="card view" id="v-lottie">
       <div class="scrollbox" id="scrollbox"><div class="canvasbox checker" id="lottieWrap"><div id="lottieBox" style="width:100%;height:100%;display:grid;place-items:center"></div><div class="busy" id="busy" hidden></div></div></div>
       <div class="transport">
-        <button type="button" id="playBtn" data-tip="Play / pause" aria-label="Pause" class="icon tip-up"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg></button>
+        <button type="button" class="ib" id="playBtn" data-tip="Play / pause" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
         <input type="range" id="scrub" min="0" max="100" value="0" aria-label="Scrub timeline">
         <span class="tc" id="tc">0 / 0</span>
       </div>
     </div>
-    <div class="view" id="v-source" hidden>
+    <div class="card view" id="v-source" hidden>
       <div class="fitbox canvasbox checker"><canvas id="srcCanvas"></canvas></div>
       <div class="filmstrip" id="film"></div>
     </div>
-    <div class="view" id="v-parts" hidden>
+    <div class="card view" id="v-parts" hidden>
       <div class="fitbox canvasbox checker"><canvas id="partsCanvas"></canvas></div>
       <p class="hint" id="partsHint">Load an image or SVG to see its parts.</p>
     </div>
     <dl class="stats">
       <div data-tip="Size of the Lottie JSON. The arrow compares with your previous settings."><dt>JSON</dt><dd id="stSize">–</dd></div>
-      <div data-tip="Gzipped size, close to what a .lottie or web server transfer costs"><dt>Gzipped</dt><dd id="stGz">–</dd></div>
+      <div data-tip="Gzipped size, close to what a .lottie or a web server transfer costs"><dt>Gzipped</dt><dd id="stGz">–</dd></div>
       <div data-tip="Total path points"><dt>Vertices</dt><dd id="stVerts">–</dd></div>
       <div data-tip="Animated keyframes"><dt>Keys</dt><dd id="stKeys">–</dd></div>
       <div data-tip="Layers in the animation"><dt>Layers</dt><dd id="stLayers">–</dd></div>
       <div data-tip="Vector paths"><dt>Paths</dt><dd id="stPaths">–</dd></div>
       <div data-tip="Length of the animation"><dt>Duration</dt><dd id="stDur">–</dd></div>
-      <div data-tip="Canvas size in pixels" class="tip-left"><dt>Canvas</dt><dd id="stCanvas">–</dd></div>
+      <div data-tip="Canvas size in pixels"><dt>Canvas</dt><dd id="stCanvas">–</dd></div>
     </dl>
-    <div class="infoline"><div class="features" id="features"></div></div>
+    <div class="features" id="features"></div>
     <ul class="notes" id="notes"></ul>
   </section>
+  <footer class="foot">
+    <span>© 2026 Jobit Joseph · MIT License</span>
+    <span>Includes lottie-web (MIT, © 2015 Bodymovin) and imagetracerjs (public domain)</span>
+  </footer>
 </main>
-
-<footer class="foot">
-  <span>© 2026 Jobit Joseph. All rights reserved.</span>
-  <span>Includes lottie-web (MIT, © 2015 Bodymovin) and imagetracerjs (public domain).</span>
-</footer>
+<div id="tip" role="tooltip" aria-hidden="true"></div>
 
 <!--
 lottie-web 5.12.2, inlined so the tool works offline.
@@ -1656,7 +1689,7 @@ if(typeof define === 'function' && define.amd){
 <script id="src-core">
 /* Lottie Forge tracing core: palette, quantisation, centre-line strokes, curve fitting.
    Runs in a Web Worker (or on the page as a fallback). Needs ImageTracer loaded first.
-   © 2026 Jobit Joseph. All rights reserved. */
+   Copyright (c) 2026 Jobit Joseph. SPDX-License-Identifier: MIT */
 var Core = (function () {
   "use strict";
   const IT = (typeof ImageTracer !== "undefined") ? ImageTracer : (typeof require !== "undefined" ? require("./pk/package/imagetracer_v1.2.6.js") : null);
@@ -2455,7 +2488,7 @@ if (typeof module !== "undefined") module.exports = Core;
 <script id="src-motion">
 /* Lottie Forge smart motion: follow traced shapes across frames and store their motion as
    keyframes (rigid move/rotate/scale, or point morphing) instead of redrawing every frame.
-   © 2026 Jobit Joseph. All rights reserved. */
+   Copyright (c) 2026 Jobit Joseph. SPDX-License-Identifier: MIT */
 var Motion = (function () {
   const Core = (typeof self !== "undefined" && self.Core) ? self.Core : (typeof require !== "undefined" ? require(__dirname + "/core.js") : null);
   "use strict";
@@ -3572,7 +3605,7 @@ if (typeof module !== "undefined") module.exports = LMC;
 </script>
 <script>
 /* Lottie Forge — image / GIF / video / SVG / Lottie → optimised vector Lottie and LottieMCU binary
-   © 2026 Jobit Joseph. All rights reserved. */
+   Copyright (c) 2026 Jobit Joseph. SPDX-License-Identifier: MIT */
 "use strict";
 const $ = s => document.querySelector(s);
 const LS = {
@@ -3805,7 +3838,7 @@ function settings() {
     minShare: S.minShare, prec: +$("#prec").value, fps: +$("#fps").value, strip: $("#strip").checked,
     sfps: +$("#sfps").value, maxf: +$("#maxf").value, dedupe: $("#dedupe").checked, allFrames: $("#allFrames").checked, trimA: Math.max(0, +$("#trimA").value || 0), trimB: Math.max(0, +$("#trimB").value || 0),
     motionMode: $("#motionMode").value, loop: +$("#loop").value,
-    allPreset: (S.base && S.base.mode === "frames") ? $("#allPresetF").value : $("#allPreset").value,
+    allPreset: $("#allPreset").value,
     optHidden: $("#optHidden").checked, optTiny: $("#optTiny").checked, optRefit: $("#optRefit").checked
   };
 }
@@ -3842,7 +3875,7 @@ function presetAnim(key, D, w, h) {
     return { ...a, keys };
   });
 }
-["#allPreset", "#partPreset", "#allPresetF"].forEach(id => { $(id).innerHTML = Object.entries(PRESETS).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join(""); });
+["#allPreset", "#partPreset"].forEach(id => { $(id).innerHTML = Object.entries(PRESETS).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join(""); });
 
 /* ---------------- source loading ---------------- */
 async function imageFromBlob(blob) {
@@ -4519,7 +4552,7 @@ function buildParts() {
 function updatePartSel() {
   const sel = $("#partPreset");
   sel.disabled = !S.selPart;
-  $("#partTag").textContent = S.selPart || "none selected";
+  $("#partTag").textContent = S.selPart || "none";
   sel.value = (S.selPart && S.partMotions[S.selPart]) || "none";
 }
 function drawParts() {
@@ -4582,25 +4615,23 @@ function drawSource() {
 function drawSwatches() {
   const bar = $("#swatchbar"), box = $("#swatches");
   const pal = (S.base && S.base.palette) || [];
-  bar.hidden = !pal.length;
-  box.innerHTML = "";
+  box.innerHTML = pal.length ? "" : '<span class="mini">Colours appear after tracing</span>';
   pal.forEach((p, i) => {
     if (p.a < 32) return;
     const b = document.createElement("button");
     b.type = "button"; b.className = "swatch" + (p.bg ? " bg" : "") + (p.deleted ? " del" : "");
     b.style.background = `rgb(${p.r},${p.g},${p.b})`;
-    b.title = `rgb(${p.r}, ${p.g}, ${p.b}) · ${(p.share * 100).toFixed(1)}% of the image${p.bg ? " · background" : ""}${p.deleted ? " · deleted" : ""}`;
+    b.dataset.tip = `rgb(${p.r}, ${p.g}, ${p.b}) · ${(p.share * 100).toFixed(1)}% of the image${p.bg ? " · background (removed)" : ""}${p.deleted ? " · deleted" : ""}. Click to select.`;
     b.setAttribute("aria-pressed", String(S.selColor === i));
     b.addEventListener("click", () => { S.selColor = S.selColor === i ? -1 : i; drawSwatches(); });
     box.appendChild(b);
   });
   const sel = pal[S.selColor];
   const hasEdits = S.edits.merge.length || S.edits.del.length;
-  $("#swatchActions").hidden = !(sel || hasEdits);
-  $("#swMerge").hidden = $("#swDelete").hidden = !sel;
-  $("#swatchSel").textContent = sel ? `rgb(${sel.r}, ${sel.g}, ${sel.b}), ${(sel.share * 100).toFixed(1)}%` : "";
-  $("#swDelete").textContent = sel && sel.deleted ? "Restore" : "Delete";
-  $("#swReset").hidden = !hasEdits;
+  $("#swMerge").disabled = $("#swDelete").disabled = !sel;
+  $("#swatchSel").textContent = sel ? `${(sel.share * 100).toFixed(1)}%` : "";
+  $("#swDelete").dataset.tip = sel && sel.deleted ? "Restore the selected colour" : "Delete: leave the selected colour out of the result (click again to restore)";
+  $("#swReset").disabled = !hasEdits;
 }
 $("#swMerge").addEventListener("click", () => {
   const p = S.base.palette[S.selColor]; if (!p) return;
@@ -4685,7 +4716,7 @@ function applyZoom(L) {
   const k = z === "fit" ? fitK : z === "auto" ? Math.min(1, fitK) : +z;
   wrap.style.width = Math.max(1, Math.floor(w * k)) + "px"; wrap.style.height = Math.max(1, Math.floor(h * k)) + "px";
 }
-if ("ResizeObserver" in window) new ResizeObserver(() => applyZoom()).observe($("#scrollbox"));
+if ("ResizeObserver" in window) { let raf = 0; new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => applyZoom()); }).observe($("#scrollbox")); }
 $("#zoom").addEventListener("change", () => { LS.set("zoom", $("#zoom").value); applyZoom(); });
 async function gzSize(str) {
   if (!("CompressionStream" in window)) return null;
@@ -4728,15 +4759,19 @@ async function updateStats(L, keys) {
 const st_motion = () => $("#motionMode").value;
 function updateMotionUI() {
   const mode = S.base ? S.base.mode : "none";
-  $("#motionImage").hidden = mode !== "image" && mode !== "none";
-  $("#motionFrames").hidden = mode !== "frames";
-  $("#motionLottie").hidden = mode !== "lottie";
-  $("#lottieOpts").hidden = mode !== "lottie";
+  const isImg = mode === "image" || mode === "none";
+  document.querySelector('[data-seg="motionMode"]').classList.toggle("dis", mode !== "frames");
+  $("#loop").disabled = !isImg; $("#loop").closest(".sl").classList.toggle("disabled", !isImg);
+  $("#rebuildBtn").disabled = mode !== "lottie";
+  ["#optHidden", "#optTiny", "#optRefit"].forEach(id => { $(id).disabled = mode !== "lottie"; });
+  $("#motionInfo").textContent = ""; $("#lottieInfo").textContent = "";
+  syncSegs();
   if (mode === "frames") {
     const ms = S.motionStats;
     $("#motionInfo").textContent = st_motion() === "smart" && ms
-      ? `${S.base.frames.length} frames → ${ms.tracks} tracked shape${ms.tracks === 1 ? "" : "s"}: ${ms.rigid} moving as a whole, ${ms.morph + (ms.dense || 0)} changing shape, ${ms.still} still${ms.flip ? `, ${ms.flip} redrawn per frame` : ""}.`
-      : `${S.base.frames.length} frames, each drawn as its own vector layer.`;
+      ? `${S.base.frames.length} frames → ${ms.tracks} shapes: ${ms.rigid} moving, ${ms.morph + (ms.dense || 0)} morphing, ${ms.still} still${ms.flip ? `, ${ms.flip} redrawn` : ""}`
+      : `${S.base.frames.length} frames as separate layers`;
+    $("#motionInfo").dataset.tip = $("#motionInfo").textContent;
   }
   if (mode === "lottie") {
     const L = S.src.anim, rep = S.optReport || {};
@@ -4750,13 +4785,14 @@ function updateMotionUI() {
     if (rep.refit) parts.push(`${rep.refit} path${rep.refit === 1 ? "" : "s"} refitted.`);
     if (rep.staticProps || rep.keys) parts.push(`${rep.staticProps} constant animation${rep.staticProps === 1 ? "" : "s"} made static, ${rep.keys} redundant key${rep.keys === 1 ? "" : "s"} dropped.`);
     $("#lottieInfo").textContent = parts.join(" ");
+    $("#lottieInfo").dataset.tip = parts.join(" ");
   }
 }
 
 /* ---------------- LottieMCU ---------------- */
 function updateMcu() {
   const kv = $("#mcuKv"), wl = $("#mcuWarn");
-  if (!S.lottie) { kv.innerHTML = "<dt>Status</dt><dd>Nothing to convert yet</dd>"; wl.innerHTML = ""; S.lmc = null; return; }
+  if (!S.lottie) { kv.innerHTML = '<span data-tip="LottieMCU binary size and memory checks appear here">MCU: nothing to convert yet</span>'; wl.innerHTML = ""; S.lmc = null; return; }
   try {
     const r = LMC.convert(S.lottie);
     S.lmc = r;
@@ -4764,14 +4800,15 @@ function updateMcu() {
     const vClass = v <= 32 ? "good" : v <= 256 ? "good" : "bad";
     const vNote = v <= 32 ? "fits both profiles" : v <= 256 ? "fits default; small profile needs maxPathVerts ≥ " + v : "raise maxPathVerts to " + v;
     const iNote = r.items <= 48 ? "fits both profiles" : r.items <= 192 ? "small profile needs maxItems ≥ " + r.items : "raise maxItems to " + r.items;
-    kv.innerHTML = `<dt>Binary size</dt><dd>${fmtBytes(r.data.length)} <span class="hint">(${Math.round(r.data.length / Math.max(1, S.json.length) * 100)}% of the JSON)</span></dd>
-      <dt>Nodes / paths / items</dt><dd>${r.nodes} / ${r.paths} / ${r.items}${r.clips ? ` / ${r.clips} clips` : ""}</dd>
-      <dt>Largest path</dt><dd class="${vClass}">${v} vertices · ${vNote}</dd>
-      <dt>Draw items</dt><dd class="${r.items <= 192 ? "good" : "bad"}">${r.items} at most · ${iNote}</dd>`;
+    const pct = Math.round(r.data.length / Math.max(1, S.json.length) * 100);
+    kv.innerHTML = `<span data-tip="LottieMCU binary size (${pct}% of the JSON). Nodes ${r.nodes}, paths ${r.paths}, draw items ${r.items}${r.clips ? `, clips ${r.clips}` : ""}.">MCU <b>${fmtBytes(r.data.length)}</b></span>
+      <span class="${v <= 256 ? "good" : "bad"}" data-tip="Largest path: ${v} vertices. ${vNote}. Config::maxPathVerts must be at least this.">path ${v} v ${v <= 32 ? "✓✓" : v <= 256 ? "✓" : "✗"}</span>
+      <span class="${r.items <= 192 ? "good" : "bad"}" data-tip="Draw items: ${r.items}. ${iNote}. Config::maxItems must be at least this.">items ${r.items} ${r.items <= 48 ? "✓✓" : r.items <= 192 ? "✓" : "✗"}</span>
+      <span data-tip="✓✓ fits the default and small memory profiles · ✓ default profile only · ✗ raise the limit in Config">${v <= 32 && r.items <= 48 ? "fits both profiles" : v <= 256 && r.items <= 192 ? "fits default profile" : "raise Config limits"}</span>`;
     wl.innerHTML = r.warnings.map(w => `<li>${w}</li>`).join("");
   } catch (e) {
     console.error(e); S.lmc = null;
-    kv.innerHTML = `<dt>Status</dt><dd class="bad">Conversion failed: ${String(e.message).replace(/[<>&]/g, "")}</dd>`; wl.innerHTML = "";
+    kv.innerHTML = `<span class="bad">MCU conversion failed: ${String(e.message).replace(/[<>&]/g, "")}</span>`; wl.innerHTML = "";
   }
 }
 $("#arrName").addEventListener("input", e => { const n = LMC.safeName(e.target.value); $("#arrEcho").textContent = n; });
@@ -4827,7 +4864,7 @@ $("#batchIn").addEventListener("change", async e => {
       try {
         const src = await loadSource([files[i]], st);
         const base = await processSource(src, st, () => {});
-        const { lottie: L } = compile(base, { ...st, allPreset: base.mode === "frames" ? $("#allPresetF").value : $("#allPreset").value });
+        const { lottie: L } = compile(base, st);
         const json = JSON.stringify(L);
         let slug = fileSlug(files[i].name), k = 2; while (used.has(slug)) slug = fileSlug(files[i].name) + "-" + (k++); used.add(slug);
         if (want.json) out.push({ name: slug + ".json", data: json });
@@ -4880,9 +4917,8 @@ function updateSrcInfo() {
   const s = S.src;
   const label = !s ? "empty" : s.kind === "frames" ? s.raw.length + " frames" : s.kind === "svg" ? "svg" : s.kind === "lottie" ? "lottie" : s.files ? "image" : "sample";
   $("#srcKind").textContent = label;
-  $("#srcName").textContent = s ? s.name : "Drop an image, GIF, video, SVG or Lottie file";
+  $("#srcName").textContent = s ? s.name : "Drop a file or click to open";
   $("#srcName").classList.toggle("has", !!s);
-  $("#frameOpts").open = !!s && (s.kind === "frames" || s.kind === "lottie");
 }
 async function resample() {
   if (!S.src || !S.src.files || S.src.kind === "image" || S.src.kind === "svg") return;
@@ -4941,22 +4977,28 @@ function updateAllFramesUI() { const on = $("#allFrames").checked; $("#sfps").di
 $("#allFrames").addEventListener("change", () => { updateAllFramesUI(); LS.set("allFrames", $("#allFrames").checked ? "1" : "0"); resample(); });
 $("#rmbg").addEventListener("change", scheduleReprocess);
 $("#aaclean").addEventListener("change", traceChange);
-function updateEngineUI() { const lineart = $("#engine").value === "lineart"; $("#strokesWrap").hidden = !lineart; $("#smaxWrap").hidden = !lineart || !$("#strokes").checked; }
+function updateEngineUI() {
+  const lineart = $("#engine").value === "lineart";
+  $("#strokes").disabled = !lineart;
+  const on = lineart && $("#strokes").checked;
+  $("#smax").disabled = !on; $("#smaxWrap").classList.toggle("disabled", !on);
+  syncSegs();
+}
 $("#engine").addEventListener("change", () => { LS.set("engine", $("#engine").value); updateEngineUI(); scheduleReprocess(); });
-$("#strokes").addEventListener("change", () => { toCustom(); $("#smaxWrap").hidden = !$("#strokes").checked; scheduleReprocess(); });
-function updateSizeUI() { $("#customSize").hidden = $("#csize").value !== "custom"; }
+$("#strokes").addEventListener("change", () => { toCustom(); updateEngineUI(); scheduleReprocess(); });
+function updateSizeUI() { const c = $("#csize").value === "custom"; $("#cw").disabled = $("#ch").disabled = !c; $("#customSize").classList.toggle("disabled", !c); }
 $("#csize").addEventListener("change", () => { toCustom(); updateSizeUI(); LS.set("csize", $("#csize").value); scheduleReprocess(); });
 ["#cw", "#ch"].forEach(id => $(id).addEventListener("change", () => { LS.set(id.slice(1), $(id).value); scheduleReprocess(); }));
 $("#resPreset").addEventListener("change", e => {
   if (!e.target.value) return;
   const [w, h] = e.target.value.split("x"); $("#cw").value = w; $("#ch").value = h; LS.set("cw", w); LS.set("ch", h);
+  if ($("#csize").value !== "custom") { $("#csize").value = "custom"; LS.set("csize", "custom"); toCustom(); updateSizeUI(); }
   e.target.value = ""; scheduleReprocess();
 });
 $("#prec").addEventListener("change", () => { toCustom(); S.base && S.base.mode === "lottie" ? scheduleCompile() : scheduleReprocess(); });
 $("#fps").addEventListener("change", () => { toCustom(); scheduleCompile(); });
 $("#strip").addEventListener("change", () => { toCustom(); scheduleCompile(); });
 $("#allPreset").addEventListener("change", scheduleCompile);
-$("#allPresetF").addEventListener("change", scheduleCompile);
 $("#motionMode").addEventListener("change", () => { LS.set("motionMode", $("#motionMode").value); scheduleCompile(); });
 ["#optHidden", "#optTiny", "#optRefit"].forEach(id => $(id).addEventListener("change", scheduleCompile));
 $("#profile").addEventListener("change", e => {
@@ -4982,12 +5024,52 @@ document.addEventListener("drop", e => {
   if (e.target.closest && e.target.closest('label[for="batchIn"]')) return;
   openFiles(e.dataTransfer.files);
 });
-// left-hand step tabs
-document.querySelectorAll(".steptabs [data-step]").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll(".steptabs [data-step]").forEach(x => x.setAttribute("aria-selected", String(x === b)));
-  ["s1", "s2", "s3", "s4"].forEach(id => { $("#" + id).hidden = id !== b.dataset.step; });
-  try { localStorage.setItem("lf.step", b.dataset.step); } catch (e) {}
-}));
+// segmented buttons drive the hidden selects (#engine, #motionMode)
+function syncSegs() {
+  document.querySelectorAll("[data-seg]").forEach(g => {
+    const sel = $("#" + g.dataset.seg);
+    g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.val === sel.value)));
+  });
+}
+document.querySelectorAll("[data-seg]").forEach(g => g.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+  const sel = $("#" + g.dataset.seg);
+  if (sel.value === b.dataset.val) return;
+  sel.value = b.dataset.val; syncSegs();
+  sel.dispatchEvent(new Event("change"));
+})));
+// floating tooltips: one element, positioned next to the hovered control and kept inside the window
+(function tooltips() {
+  const tip = $("#tip"); let cur = null, timer = 0;
+  const place = el => {
+    const r = el.getBoundingClientRect(), m = 8;
+    tip.style.left = "0px"; tip.style.top = "0px";
+    const tw = tip.offsetWidth, th = tip.offsetHeight, vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+    let x = r.left + r.width / 2 - tw / 2, y = r.bottom + 6;
+    if (y + th > vh - m) y = r.top - th - 6;
+    if (y < m) y = Math.min(vh - th - m, r.bottom + 6);
+    x = Math.max(m, Math.min(vw - tw - m, x));
+    tip.style.left = Math.round(x) + "px"; tip.style.top = Math.round(Math.max(m, y)) + "px";
+  };
+  const show = el => {
+    const text = el.dataset.tip; if (!text) return;
+    cur = el; tip.textContent = text; tip.classList.add("on"); place(el);
+  };
+  const hide = () => { cur = null; tip.classList.remove("on"); clearTimeout(timer); };
+  document.addEventListener("pointerover", e => {
+    if (e.pointerType === "touch") return;
+    const el = e.target.closest && e.target.closest("[data-tip]");
+    if (el === cur) return;
+    clearTimeout(timer);
+    if (!el) { hide(); return; }
+    timer = setTimeout(() => show(el), 250);
+  });
+  document.addEventListener("pointerout", e => { if (cur && !cur.contains(e.relatedTarget)) hide(); });
+  document.addEventListener("focusin", e => { const el = e.target.closest && e.target.closest("[data-tip]"); if (el && e.target.matches(":focus-visible")) show(el); });
+  document.addEventListener("focusout", hide);
+  document.addEventListener("scroll", hide, true);
+  document.addEventListener("pointerdown", hide);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") hide(); });
+})();
 $("#fileIn").addEventListener("change", e => { if (e.target.files.length) openFiles(e.target.files); e.target.value = ""; });
 document.addEventListener("paste", e => {
   if (/^(TEXTAREA|INPUT)$/.test(document.activeElement && document.activeElement.tagName)) return;
@@ -5010,9 +5092,7 @@ $("#playBtn").addEventListener("click", () => {
 });
 function setPlayIcon() {
   const b = $("#playBtn");
-  b.innerHTML = S.playing
-    ? '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg>'
-    : '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9.5-5.5z" fill="currentColor"/></svg>';
+  b.innerHTML = `<svg aria-hidden="true"><use href="#i-${S.playing ? "pause" : "play"}"/></svg>`;
   b.setAttribute("aria-label", S.playing ? "Pause" : "Play");
 }
 $("#scrub").addEventListener("input", e => {
@@ -5059,7 +5139,6 @@ $("#loadSample").addEventListener("click", async () => {
     $("#lottieBox").innerHTML = `<div class="empty"><strong>Player failed to start</strong>The built-in libraries could not run in this browser. Try a current Chrome, Edge, Firefox or Safari.</div>`;
     return;
   }
-  const step = LS.get("step", "s1"); const sb = document.querySelector(`.steptabs [data-step="${step}"]`); if (sb) sb.click();
   const z = LS.get("zoom", "auto"); if ([...$("#zoom").options].some(o => o.value === z)) $("#zoom").value = z;
   const cs = LS.get("csize", ""); if ([...$("#csize").options].some(o => o.value === cs)) $("#csize").value = cs;
   $("#cw").value = LS.get("cw", "320"); $("#ch").value = LS.get("ch", "240");
@@ -5067,6 +5146,7 @@ $("#loadSample").addEventListener("click", async () => {
   $("#allFrames").checked = LS.get("allFrames", "0") === "1"; updateAllFramesUI();
   const eng = LS.get("engine", "classic"); if (eng === "classic" || eng === "lineart") $("#engine").value = eng; updateEngineUI();
   const mm = LS.get("motionMode", ""); if (mm === "smart" || mm === "flip") $("#motionMode").value = mm;
+  syncSegs(); drawSwatches();
   showEmpty(); updateMotionUI();
 })();
 
