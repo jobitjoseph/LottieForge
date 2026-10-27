@@ -2,7 +2,9 @@
 
 Turn images, GIFs, videos, SVGs and existing Lottie files into optimised, **fully vector** Lottie animations: for the web, for apps, and for microcontrollers through [LottieMCU](https://github.com/jobitjoseph/LottieMCU).
 
-Lottie Forge runs entirely in your browser, works offline, and never uploads your files anywhere.
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Lottie Forge is a single HTML file. It runs entirely in your browser, works offline, and never uploads your files anywhere.
 
 ---
 
@@ -46,14 +48,17 @@ The tool then runs at `https://<your-user>.github.io/<repo>/`.
 
 ## How to use
 
-The left panel has four tabs. Hover over any control to see what it does.
+All controls sit in one column on the left. Every option is visible at once, and the page fits a 720p screen or larger without scrolling. Icons keep it compact: hover over any icon or button to see what it does. On phones the layout becomes a single scrolling column, with text labels next to the icons.
 
-| Tab | What it does |
+| Group | What it does |
 |---|---|
-| **01 Source** | Frame sampling for GIF, video and Lottie rebuilds: sample rate, frame limit, start and end trim, merge similar frames, or use every frame at the source's own rate. |
-| **02 Vectorise** | Profile, output size, tracing engine, colour count, curve tolerance, minimum path size, pre-blur, background removal, edge cleaning, lines as strokes, and the colour swatches (click one to merge or delete it). |
-| **03 Motion** | Still images and SVGs: presets for the whole artwork or for a part (pick parts in the **Parts** view). Frame sequences: flipbook or smart motion. Lottie files: rebuild as smart motion. |
-| **04 Export** | Frame rate, decimals, name stripping, Lottie optimisation options, downloads, the LottieMCU report and batch convert. |
+| **File** | Drop a file (or click to open one), or load the sample. |
+| **Frames** | Frame sampling for GIF, video and Lottie rebuilds: sample rate, frame limit, start and end trim, merge similar frames, or use every frame at the source's own rate. |
+| **Vectorise** | Profile, tracing engine (Curves or Line art), output size (custom width × height with display presets), colour count, curve tolerance, minimum path size, pre-blur, remove background, clean edges, lines as strokes with a maximum stroke width, and the colour swatches (select one to merge or delete it). |
+| **Motion** | Flipbook or Smart for frame sequences, a preset for the whole artwork, a preset for one part (pick it in the **Parts** view), loop length, and "Rebuild Lottie" for flipbook-style Lottie files. |
+| **Export** | Frame rate, decimals, strip names, Lottie clean-up options, .json and .lottie downloads, the LottieMCU header and binary with a memory check, and batch convert. |
+
+The preview on the right shows the animation at its exact output size. Zoom, the Lottie/Source/Parts views and the background colour are above it, and the file statistics are below.
 
 ### Profiles
 
@@ -147,6 +152,10 @@ Bundled inside `lottie-forge.html`:
 
 **Jobit Joseph**: [github.com/jobitjoseph](https://github.com/jobitjoseph)
 
-## Copyright
+## License
 
-© 2026 Jobit Joseph. All rights reserved.
+Copyright (c) 2026 Jobit Joseph.
+
+Lottie Forge is released under the [MIT License](LICENSE). You can use it in personal and commercial projects, and modify and redistribute it, as long as the copyright notice and licence text are kept.
+
+Animations you create belong to you. Files you convert keep their own licences.
