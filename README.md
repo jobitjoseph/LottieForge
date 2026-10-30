@@ -8,11 +8,13 @@ Lottie Forge is a single HTML file. It runs entirely in your browser, works offl
 
 <p align="center">
   <a href="https://github.io">
-    <img src="LottieForge.png" alt="Lottie Forge Logo">
+    <img src="LottieForge.png" alt="Lottie Forge Logo" width="250">
   </a>
 </p>
 
-# [Lottie Forge](https://jobitjoseph.github.io/LottieForge/)
+<h1 align="center">
+  <a href="https://jobitjoseph.github.io/LottieForge/">Lottie Forge</a>
+</h1>
 
 ---
 
