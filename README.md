@@ -5,10 +5,11 @@ Turn images, GIFs, videos, SVGs and existing Lottie files into optimised, **full
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 Lottie Forge is a single HTML file. It runs entirely in your browser, works offline, and never uploads your files anywhere.
-<p style="text-align: center;">
-    <a href="https://jobitjoseph.github.io/LottieForge/>
-        <img src="https://github.com/jobitjoseph/LottieForge/blob/6512cb784856ae5a143fbd7623f00a96f1cb0cae/LottieForge.png" alt="Description">
-    </a>
+
+<p align="center">
+  <a href="https://github.io">
+    <img src="https://githubusercontent.com" alt="Lottie Forge Logo">
+  </a>
 </p>
 
 # [Lottie Forge](https://jobitjoseph.github.io/LottieForge/)
