@@ -7,7 +7,7 @@ Turn images, GIFs, videos, SVGs and existing Lottie files into optimised, **full
 Lottie Forge is a single HTML file. It runs entirely in your browser, works offline, and never uploads your files anywhere.
 <div style="text-align: center;">
     <a href="https://jobitjoseph.github.io/LottieForge/>
-        <img src="LottieForge.png" alt="Description">
+        <img src="/LottieForge.png" alt="Description">
     </a>
 </div>
 
